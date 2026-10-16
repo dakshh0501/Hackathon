@@ -7,6 +7,8 @@ import AnalysisChartBox from './components/AnalysisChartBox';
 import DestinationDetailView from './components/DestinationDetailView';
 import ItineraryBuilderScreen from './components/ItineraryBuilderScreen';
 import AIAssistantPanel from './components/AIAssistantPanel';
+import MascotChatbotModal from './components/MascotChatbotModal';
+import { searchAllIndia } from './data/allIndiaDestinations';
 import { Compass, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -25,32 +27,33 @@ export default function App() {
   // Active biome object
   const activeBiome = SKETCH_BIOMES.find(b => b.id === (hoveredBiomeId || activeBiomeId)) || SKETCH_BIOMES[2];
 
-  // Search handler: match biome or open destination
+  // Search handler: match any city, state, or region of India
   const handleSearch = (query) => {
-    const q = query.trim().toLowerCase();
-    const matchedBiome = SKETCH_BIOMES.find(b => 
-      b.name.toLowerCase().includes(q) || 
-      b.id.toLowerCase().includes(q) ||
-      b.destinations.some(d => d.name.toLowerCase().includes(q))
-    );
+    if (!query || !query.trim()) return;
 
-    if (matchedBiome) {
-      setActiveBiomeId(matchedBiome.id);
+    // Search across all India (Delhi, Jaipur, Goa, Manali, Kerala, etc.)
+    const indiaMatch = searchAllIndia(query);
+
+    if (indiaMatch) {
+      // Find matching column biome
+      const targetBiome = SKETCH_BIOMES.find(b => b.id === indiaMatch.biomeCategory) || SKETCH_BIOMES[2];
+      setActiveBiomeId(targetBiome.id);
+
       setSelectedDestination({
-        id: matchedBiome.id,
-        name: matchedBiome.destinations[0]?.name || matchedBiome.name,
-        country: 'Natural Biosphere',
-        flag: matchedBiome.emoji,
-        image: matchedBiome.bgImage,
-        coordinates: { lat: 27.5, lng: 77.2 },
-        rating: 4.95,
-        reviewsCount: 1840,
-        description: matchedBiome.tagline,
-        story: `${matchedBiome.name} sanctuary with pristine ecosystems and seasonal weather windows.`,
-        weather: { temp: 28, condition: 'Clear', humidity: '45%', uv: '8.0' },
-        safetyIndex: 9.5,
-        dailyBudget: { budget: 2200, mid: 5400, luxury: 14000 },
-        experiences: ['Eco Guided Walk', 'Panoramic Vantage View', 'Wildlife & Flora Observation']
+        id: indiaMatch.name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        name: indiaMatch.name,
+        country: indiaMatch.state,
+        flag: '🇮🇳',
+        image: indiaMatch.coverImage,
+        coordinates: { lat: 28.6139, lng: 77.2090 },
+        rating: 4.94,
+        reviewsCount: 1950,
+        description: indiaMatch.description,
+        story: `${indiaMatch.name} is one of India's most celebrated travel regions in ${indiaMatch.state}. It boasts rich cultural legacies, authentic cuisine, and timeless seasonal weather windows.`,
+        weather: indiaMatch.weather,
+        safetyIndex: indiaMatch.safetyIndex,
+        dailyBudget: indiaMatch.budget,
+        experiences: indiaMatch.highlights
       });
       setViewMode('DESTINATION_DETAIL');
     }
@@ -292,6 +295,15 @@ export default function App() {
         onClose={() => setIsAIChatOpen(false)}
         activeDestination={selectedDestination || { name: activeBiome.name }}
         biome={activeBiome}
+      />
+
+      {/* Backpack Mascot Travel Chatbot */}
+      <MascotChatbotModal
+        isOpen={isAIChatOpen}
+        onClose={() => setIsAIChatOpen(false)}
+        onSelectDestination={(dest) => {
+          handleSearch(dest.name);
+        }}
       />
     </div>
   );
