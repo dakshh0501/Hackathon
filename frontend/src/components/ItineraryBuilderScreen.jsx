@@ -17,6 +17,84 @@ export default function ItineraryBuilderScreen({ destination, biome, onBack }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [validationResult, setValidationResult] = useState(null);
   const [generationError, setGenerationError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(null);
+
+  // Save Trip to Account & Backend
+  const handleSaveTrip = async () => {
+    setIsSaving(true);
+    setSaveSuccess(null);
+    setGenerationError(null);
+
+    try {
+      const tripPayload = {
+        destinationId: destination.id || 'dst_mathura',
+        title: `${destination.name} Journey`,
+        startDate: '2026-12-01',
+        endDate: '2026-12-03',
+        adults: 2,
+        children: 0,
+        seniors: 0,
+        pace: 'moderate',
+        tier: 'standard',
+        budgetPaise: (totalCost || 5000) * 100,
+        interests: ['Heritage', 'Culture'],
+        needs: ['Comfortable transit']
+      };
+
+      const createdTrip = await api.createTrip(tripPayload);
+
+      // Now save current itinerary items into the trip record
+      if (createdTrip && createdTrip.id) {
+        const daysPayload = itinerary.map((dayActs, idx) => ({
+          dayNumber: idx + 1,
+          date: `2026-12-0${idx + 1}`,
+          items: dayActs.map((act, actIdx) => ({
+            id: `item_${Date.now()}_${actIdx}`,
+            attractionId: `att_${actIdx}`,
+            name: act.title,
+            startTime: act.time || '10:00',
+            endTime: '12:00',
+            orderIndex: actIdx,
+            note: `${act.duration} • ₹${act.cost}`
+          }))
+        }));
+
+        await api.updateTrip(createdTrip.id, { days: daysPayload });
+        setSaveSuccess('Trip successfully saved to your account!');
+        setTimeout(() => setSaveSuccess(null), 4000);
+      }
+    } catch (err) {
+      console.warn('Trip save failed:', err);
+      setGenerationError(err.message || 'Failed to save trip to backend.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Export Calendar (.ics)
+  const handleExportCalendar = () => {
+    let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//TravelTales//TripPlanner//EN\n";
+    itinerary.forEach((dayItems, dayIdx) => {
+      dayItems.forEach((act) => {
+        icsContent += "BEGIN:VEVENT\n";
+        icsContent += `SUMMARY:${act.title} - ${destination.name}\n`;
+        icsContent += `DESCRIPTION:TravelTales Itinerary Day ${dayIdx + 1} (${act.duration})\n`;
+        icsContent += `DTSTART:2026120${dayIdx + 1}T100000Z\n`;
+        icsContent += `DTEND:2026120${dayIdx + 1}T120000Z\n`;
+        icsContent += "END:VEVENT\n";
+      });
+    });
+    icsContent += "END:VCALENDAR";
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.setAttribute('download', `${destination.name}_Itinerary.ics`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Sample day itinerary blocks
   const [itinerary, setItinerary] = useState([
@@ -175,7 +253,7 @@ export default function ItineraryBuilderScreen({ destination, biome, onBack }) {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '8px 18px',
+              padding: '8px 16px',
               fontSize: '13px',
               fontWeight: 700,
               background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)',
@@ -184,15 +262,77 @@ export default function ItineraryBuilderScreen({ destination, biome, onBack }) {
             }}
           >
             <Sparkles size={15} color="#FBBF24" />
-            <span>{isGenerating ? 'Optimizing with Engine...' : 'Auto-Generate (Backend Engine)'}</span>
+            <span>{isGenerating ? 'Optimizing...' : 'Auto-Generate'}</span>
+          </button>
+
+          <button
+            onClick={handleSaveTrip}
+            disabled={isSaving}
+            className="glass-interactive"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              fontSize: '13px',
+              fontWeight: 700,
+              backgroundColor: 'rgba(52, 211, 153, 0.2)',
+              border: '1px solid rgba(52, 211, 153, 0.45)',
+              color: '#34D399'
+            }}
+          >
+            <CheckSquare size={15} />
+            <span>{isSaving ? 'Saving...' : 'Save Trip'}</span>
+          </button>
+
+          <button
+            onClick={handleExportCalendar}
+            title="Export Calendar (.ics)"
+            className="glass-interactive"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              fontSize: '13px',
+              fontWeight: 700,
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.16)',
+              color: '#FFFFFF'
+            }}
+          >
+            <Download size={15} />
+            <span>Export</span>
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Estimated Sight Expenses:</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Estimated:</span>
             <b style={{ color: '#34D399', fontFamily: 'var(--font-mono)', fontSize: '16px' }}>₹{totalCost.toLocaleString('en-IN')}</b>
           </div>
         </div>
       </div>
+
+      {/* Save Success Banner */}
+      {saveSuccess && (
+        <div style={{
+          marginBottom: '20px',
+          padding: '12px 20px',
+          borderRadius: 'var(--radius-md)',
+          backgroundColor: 'rgba(52, 211, 153, 0.15)',
+          border: '1px solid rgba(52, 211, 153, 0.4)',
+          color: '#34D399',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '13px',
+          fontWeight: 700,
+          boxShadow: '0 8px 24px rgba(52, 211, 153, 0.15)',
+          animation: 'slideUpFade 0.3s ease'
+        }}>
+          <ShieldCheck size={18} />
+          <span>✅ {saveSuccess}</span>
+        </div>
+      )}
 
       {/* Generation Error Banner */}
       {generationError && (
