@@ -50,7 +50,7 @@ export const SKETCH_BIOMES = [
     accentColor: '#10B981',
     glowColor: 'rgba(16, 185, 129, 0.5)',
     tagline: 'Deep emerald canopies & ancient groves',
-    bgImage: 'https://images.unsplash.com/photo-1511497584788-87676104235f?auto=format&fit=crop&w=1600&q=80',
+    bgImage: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1600&q=80',
     destinations: [
       { name: 'Monteverde Cloud Canopy', temp: '22°C', rating: '4.93', visitors: '510K' },
       { name: 'Black Forest Pines', temp: '18°C', rating: '4.85', visitors: '1.4M' }
