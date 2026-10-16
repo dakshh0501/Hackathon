@@ -89,7 +89,7 @@ export const ALL_INDIAN_DESTINATIONS = [
   {
     name: 'Amritsar',
     state: 'Punjab',
-    aliases: ['amritsar', 'golden temple', 'harmandir sahib', 'punjab'],
+    aliases: ['amritsar', 'golden temple', 'harmandir sahib'],
     biomeCategory: 'gardens',
     coverImage: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=1200&q=80', // Golden Temple
     specialties: ['Harmandir Sahib (The Golden Temple)', 'World’s Largest Free Community Langar', 'Wagah Border Beating Retreat Ceremony', 'Authentic Amritsari Kulcha & Lassi'],
@@ -445,6 +445,261 @@ export const ALL_INDIAN_DESTINATIONS = [
     coordinates: { lat: 34.1526, lng: 77.5771 },
     budget: { budget: 2400, mid: 5800, luxury: 15500 },
     bestMonths: 'May – September'
+  },
+
+  // 28. Aligarh
+  {
+    name: 'Aligarh',
+    state: 'Uttar Pradesh',
+    aliases: ['aligarh', 'amu', 'aligarh fort', 'koil'],
+    biomeCategory: 'gardens',
+    coverImage: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Aligarh Muslim University (AMU) Heritage Arches', 'World-Famous Aligarh Handmade Brass Locks & Hardware', 'Historic Aligarh Fort (Koil) Ramparts', 'Authentic Sohan Halwa & Barahdwari'],
+    description: 'Famed educational and industrial center: historic Indo-Saracenic architecture of AMU, legendary century-old lockmaking craftsmanship, and historic Mughal-era fortifications.',
+    highlights: ['Sir Syed Hall & Strachey Hall historic AMU architecture', 'Heritage Lock and Brass craft workshops in old city', 'Aligarh Fort (Koil) historical ruins and moat', 'Tasting authentic Aligarh Sohan Halwa and street snacks'],
+    weather: { temp: 28, condition: 'Clear Autumn Sun', humidity: '44%', uv: '7.0' },
+    safetyIndex: 9.3,
+    coordinates: { lat: 27.8974, lng: 78.0880 },
+    budget: { budget: 1400, mid: 3400, luxury: 8500 },
+    bestMonths: 'October – March'
+  },
+
+  // 29. Kasganj (Soron Shukarkshetra)
+  {
+    name: 'Kasganj (Soron Shukarkshetra)',
+    state: 'Uttar Pradesh',
+    aliases: ['kasganj', 'soron', 'shukarkshetra', 'kashganj', 'soron ji'],
+    biomeCategory: 'river',
+    coverImage: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Sacred Soron Shukarkshetra (Varaha Avatar Shrines)', 'Holy Bathing Ghats on Sacred Ganga Riverbank', 'Traditional Patpariya & Milk Mawa Sweets', 'Historic Chamunda Devi & Raghunath Mandir'],
+    description: 'An ancient holy pilgrimage town along the banks of the sacred Ganges, revered in Hindu scriptures as the sacred site of Lord Vishnu’s Varaha incarnation and legendary for its holy Kunds.',
+    highlights: ['Bathing at Hari Ki Pauri Kund in Soron Shukarkshetra', 'Visiting ancient Varaha Temple and Raghunathji Mandir', 'Chamunda Devi temple rituals and peaceful ghat walks', 'Savoring authentic Kasganj Patpariya and fresh rabri sweets'],
+    weather: { temp: 27, condition: 'Peaceful Riverside', humidity: '48%', uv: '6.8' },
+    safetyIndex: 9.4,
+    coordinates: { lat: 27.8083, lng: 78.6475 },
+    budget: { budget: 1300, mid: 3100, luxury: 7500 },
+    bestMonths: 'October – March'
+  },
+
+  // 30. Kanpur
+  {
+    name: 'Kanpur',
+    state: 'Uttar Pradesh',
+    aliases: ['kanpur', 'cawnpore', 'bithoor', 'manchester of the east'],
+    biomeCategory: 'river',
+    coverImage: 'https://images.unsplash.com/photo-1571536802807-30451e3955d8?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Historic Bithoor on Ganga (Nana Sahib & Rani Laxmibai Bastion)', 'World-Famous Kanpur Genuine Leather Goods & Saddlery', 'Iconic Thaggu Ke Laddu & Badnam Kulfi', 'Allen Forest Zoo & Moti Jheel Waterfront'],
+    description: 'Major industrial powerhouse and historic river citadel on the Ganges, famous for the heroic 1857 freedom struggle at Bithoor, world-class leather handicrafts, and iconic street desserts.',
+    highlights: ['Valmiki Ashram & Brahmavart Ghat at historic Bithoor', 'Shopping for genuine leather footwear and goods on Mall Road', 'Enjoying Thaggu Ke Laddu and Badnam Kulfi', 'Evening stroll around Moti Jheel and botanical gardens'],
+    weather: { temp: 28, condition: 'Pleasant & Sunny', humidity: '46%', uv: '7.2' },
+    safetyIndex: 9.2,
+    coordinates: { lat: 26.4499, lng: 80.3319 },
+    budget: { budget: 1600, mid: 3800, luxury: 10000 },
+    bestMonths: 'October – March'
+  },
+
+  // 31. Lucknow
+  {
+    name: 'Lucknow',
+    state: 'Uttar Pradesh',
+    aliases: ['lucknow', 'awadh', 'city of nawabs', 'bara imambara', 'hazratganj'],
+    biomeCategory: 'gardens',
+    coverImage: 'https://images.unsplash.com/photo-1588416936097-41850ab3d86d?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Bara Imambara & Legendary Bhool Bhulaiya Labyrinth', 'Magnificent Rumi Darwaza Awadhi Gateway', 'World-Famous Galouti Kebabs & Tunday Kababi', 'Intricate Handcrafted Chikankari & Zardozi Textiles'],
+    description: 'The City of Nawabs: courtly etiquette (Tehzeeb), grand arched Awadhi monuments, the gravity-defying unsupported roof of Bara Imambara, delicate Chikankari embroidery, and legendary royal cuisine.',
+    highlights: ['Exploring the 3D maze of Bhool Bhulaiya at Bara Imambara', 'Sunset photography at Rumi Darwaza and Clock Tower', 'Tasting melt-in-mouth Galouti Kebabs at Tunday Kababi', 'Shopping for fine Chikankari kurtas in Aminabad & Hazratganj'],
+    weather: { temp: 27, condition: 'Mild Autumn Breeze', humidity: '50%', uv: '6.8' },
+    safetyIndex: 9.5,
+    coordinates: { lat: 26.8467, lng: 80.9462 },
+    budget: { budget: 1900, mid: 4500, luxury: 12500 },
+    bestMonths: 'October – March'
+  },
+
+  // 32. Mirzapur
+  {
+    name: 'Mirzapur',
+    state: 'Uttar Pradesh',
+    aliases: ['mirzapur', 'vindhyachal', 'chunar', 'vindhyavasini'],
+    biomeCategory: 'river',
+    coverImage: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Maa Vindhyavasini Devi Temple (Vindhyachal Shaktipeeth)', 'Historic Chunar Fort Overlooking Holy Ganga', 'World-Renowned Handwoven Mirzapur Woolen Carpets', 'Wyndham & Sirsi Scenic Waterfalls & Brass Craft'],
+    description: 'Steeped in sacred folklore along the Ganges: the venerated hilltop Shaktipeeth of Maa Vindhyavasini, medieval cliffside Chunar Fort, cascading Vindhya waterfalls, and master carpet weavers.',
+    highlights: ['Darshan at Maa Vindhyavasini & Ashtabhuja Temple in Vindhyachal', 'Exploring the ramparts and dungeon vaults of Chunar Fort', 'Visiting artisan workshops of hand-knotted Mirzapur carpets', 'Picnicking at Wyndham Falls amidst rugged sandstone canyons'],
+    weather: { temp: 28, condition: 'Warm & Serene', humidity: '44%', uv: '7.4' },
+    safetyIndex: 9.3,
+    coordinates: { lat: 25.1337, lng: 82.5644 },
+    budget: { budget: 1500, mid: 3600, luxury: 9000 },
+    bestMonths: 'October – March'
+  },
+
+  // 33. Lokhandwala
+  {
+    name: 'Lokhandwala',
+    state: 'Maharashtra (Mumbai)',
+    aliases: ['lokhandwala', 'lokhandwala complex', 'andheri west', 'versova'],
+    biomeCategory: 'beach',
+    coverImage: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Lokhandwala Market High-Street Designer Boutiques', 'Celebrity Cafes, Artisanal Eateries & Street Food', 'Proximity to Versova Sunset Beach & Art Studios', 'Vibrant Bollywood Lifestyle & Night Market Strolls'],
+    description: 'Mumbai’s premier entertainment and lifestyle neighborhood in Andheri West, home to television and film actors, trendy open-air market boutiques, high-end cafes, and lively Arabian sea nightlife.',
+    highlights: ['Strolling the bustling Lokhandwala Market fashion street', 'Brunch at chic celebrity-frequented European cafes', 'Sunset walk along neighboring Versova Beach', 'Exploring vibrant late-night street food and dessert parlors'],
+    weather: { temp: 30, condition: 'Warm Coastal Breeze', humidity: '68%', uv: '8.0' },
+    safetyIndex: 9.5,
+    coordinates: { lat: 19.1438, lng: 72.8277 },
+    budget: { budget: 2500, mid: 6500, luxury: 18000 },
+    bestMonths: 'October – March'
+  },
+
+  // 34. Ajmer
+  {
+    name: 'Ajmer',
+    state: 'Rajasthan',
+    aliases: ['ajmer', 'ajmer sharif', 'khwaja moinuddin chishti', 'ana sagar', 'pushkar lake'],
+    biomeCategory: 'desert',
+    coverImage: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Sacred Ajmer Sharif Dargah of Khwaja Moinuddin Chishti', 'Scenic Ana Sagar Lake Marble Pavilions (Baradari)', 'Towering Taragarh Fort with Panoramic Aravalli Vistas', 'Gateway to Sacred Pushkar Brahma Temple & Holy Sarovar'],
+    description: 'Encircled by the rugged Aravalli mountains, Ajmer is a globally revered pilgrimage destination centered on the sufi shrine of Khwaja Moinuddin Chishti, marble lake promenades, and the sacred Pushkar valley.',
+    highlights: ['Prayers and qawwali music at Ajmer Sharif Dargah', 'Sunset walk along Ana Sagar lake’s Daulat Bagh and white marble pavilions', 'Panoramic trek to hilltop Taragarh Fort', 'Day excursion to holy Pushkar lake and Brahma Temple'],
+    weather: { temp: 29, condition: 'Golden Desert Sun', humidity: '32%', uv: '8.0' },
+    safetyIndex: 9.5,
+    coordinates: { lat: 26.4499, lng: 74.6399 },
+    budget: { budget: 1600, mid: 3900, luxury: 11000 },
+    bestMonths: 'October – March'
+  },
+
+  // 35. Srinagar (Shrinagar)
+  {
+    name: 'Srinagar',
+    state: 'Jammu & Kashmir',
+    aliases: ['srinagar', 'shrinagar', 'dal lake', 'kashmir', 'kashmir valley', 'shikara'],
+    biomeCategory: 'mountain',
+    coverImage: 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Iconic Dal Lake Shikara Rides & Carved Cedar Houseboats', 'Nishat Bagh & Shalimar Bagh Terraced Mughal Gardens', 'Pashmina Shawls, Walnut Wood Carving & Kashmiri Saffron', 'Historic Shankaracharya Hilltop Temple & Floating Vegetable Market'],
+    description: 'Paradise on Earth: tranquil shimmering waters of Dal Lake flanked by snow-dusted Zabarwan peaks, decorated cedar houseboats, cascading Mughal terraced gardens, and fragrant saffron kahwa.',
+    highlights: ['Dawn Shikara boat ride through the floating lotus flower markets', 'Staying in a handcrafted heritage cedar houseboat on Nigeen Lake', 'Strolling under majestic Chinar trees at Shalimar & Nishat Mughal Gardens', 'Sampling authentic 36-course Kashmiri Wazwan and Kehwa tea'],
+    weather: { temp: 12, condition: 'Crisp Valley Sun', humidity: '52%', uv: '6.5' },
+    safetyIndex: 9.4,
+    coordinates: { lat: 34.0837, lng: 74.7973 },
+    budget: { budget: 2200, mid: 5200, luxury: 15500 },
+    bestMonths: 'April – October (Spring blooms & Autumn chinars), Dec – Feb (Snow)'
+  },
+
+  // 36. Patna
+  {
+    name: 'Patna',
+    state: 'Bihar',
+    aliases: ['patna', 'pataliputra', 'bihar', 'takht sri patna sahib', 'golghar'],
+    biomeCategory: 'river',
+    coverImage: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Takht Sri Patna Sahib (Birthplace of Guru Gobind Singh Ji)', 'Iconic Beehive-Shaped Golghar Overlooking Ganga', 'World-Class Bihar Museum Ancient Artefacts', 'Authentic Traditional Litti Chokha & Khaja Sweets'],
+    description: 'One of the world’s oldest continuously inhabited cities: the glorious Mauryan capital of Pataliputra, sacred Takht Sri Patna Sahib on the holy Ganga, and the gateway to historic Nalanda & Bodh Gaya.',
+    highlights: ['Darshan at marble Takht Sri Harmandir Sahib Gurudwara', 'Panoramic climb atop the historic 1786 Golghar granary', 'Viewing the Didarganj Yakshi at the modern Bihar Museum', 'Tasting piping-hot Litti Chokha with sattu and spicy chutneys'],
+    weather: { temp: 28, condition: 'Pleasant Autumn', humidity: '54%', uv: '7.0' },
+    safetyIndex: 9.2,
+    coordinates: { lat: 25.5941, lng: 85.1376 },
+    budget: { budget: 1500, mid: 3600, luxury: 9500 },
+    bestMonths: 'October – March'
+  },
+
+  // 37. Pathankot (Pathankoth)
+  {
+    name: 'Pathankot',
+    state: 'Punjab',
+    aliases: ['pathankot', 'pathankoth', 'mukteshwar', 'shahpurkandi'],
+    biomeCategory: 'mountain',
+    coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Ancient 5500-Year-Old Mukteshwar Cave Temples on Ravi River', 'Historic Shahpurkandi Fort & Ranjit Sagar Dam Reservoir', 'Strategic Tri-State Gateway to Himachal, Kashmir & Punjab', 'Scenic Pine Hills of Nurpur Fort & Madhopur Headworks'],
+    description: 'The scenic meeting point of Punjab, Himachal, and Jammu & Kashmir, nestled where the rushing waters of River Ravi emerge from the Himalayan foothills, rich in Pandava cave history and frontier fortresses.',
+    highlights: ['Pilgrimage to carved stone Mukteshwar Mahadev caves on the Ravi cliffs', 'Scenic boat ride on the vast turquoise waters of Ranjit Sagar Dam', 'Exploring historic 16th-century Shahpurkandi Fort', 'Sunset view across the scenic Madhopur headworks barrage'],
+    weather: { temp: 22, condition: 'Fresh Foothill Breeze', humidity: '48%', uv: '6.5' },
+    safetyIndex: 9.6,
+    coordinates: { lat: 32.2643, lng: 75.6525 },
+    budget: { budget: 1600, mid: 3700, luxury: 9800 },
+    bestMonths: 'October – April'
+  },
+
+  // 38. Punjab (Cultural Heartland & Five Rivers)
+  {
+    name: 'Punjab',
+    state: 'Punjab',
+    aliases: ['punjab', 'land of five rivers', 'anandpur sahib', 'punjabi'],
+    biomeCategory: 'gardens',
+    coverImage: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['The Land of Five Rivers (Sutlej, Beas, Ravi, Chenab, Jhelum)', 'Virasat-e-Khalsa Heritage Museum at Anandpur Sahib', 'Lush Golden Mustard (Sarson) Fields & Traditional Pinds', 'Legendary Punjabi Hospitality, Sarson Ka Saag & Makki Di Roti'],
+    description: 'The golden breadbasket of India and Land of Five Rivers: vibrant mustard blossoms stretching across horizon farms, soul-stirring Gurbani, historic forts, energetic Bhangra, and heartfelt hospitality.',
+    highlights: ['Experiencing rustic village farm life and tractor rides in rural Punjab', 'Visiting the monumental Virasat-e-Khalsa complex in holy Anandpur Sahib', 'Patriotic fervor at the Hussainiwala and Wagah border ceremonies', 'Authentic culinary feast of Sarson Ka Saag, Makki Di Roti, and white makkhan'],
+    weather: { temp: 24, condition: 'Golden Autumn Sun', humidity: '46%', uv: '6.8' },
+    safetyIndex: 9.7,
+    coordinates: { lat: 31.1471, lng: 75.3412 },
+    budget: { budget: 1800, mid: 4200, luxury: 11500 },
+    bestMonths: 'October – March'
+  },
+
+  // 39. Haryana (Haaryana)
+  {
+    name: 'Haryana',
+    state: 'Haryana',
+    aliases: ['haryana', 'haaryana', 'kurukshetra', 'pinjore', 'panipat', 'gurugram', 'gurgaon'],
+    biomeCategory: 'gardens',
+    coverImage: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Sacred Kurukshetra Brahma Sarovar (Land of the Mahabharata)', 'Historic 17th-Century Pinjore Mughal Gardens (Yadavindra)', 'Sultanpur National Park Migratory Bird Wetland Sanctuary', 'Rich Agrarian Heritage, Bajra Khichdi & Traditional Dairy Culture'],
+    description: 'The historic cradle of the Mahabharata and Gita updesh at Kurukshetra, boasting terraced Mughal pleasure gardens at Pinjore, rich wetlands at Sultanpur, and deep agrarian heritage.',
+    highlights: ['Evening Aarti and reflection at the vast Brahma Sarovar in Kurukshetra', 'Strolling terraced water channels at historic Pinjore Gardens', 'Birdwatching Siberian cranes at Sultanpur National Park wetland', 'Savoring authentic Bajra Khichdi, fresh white butter, and lassi'],
+    weather: { temp: 26, condition: 'Breezy & Sunny', humidity: '42%', uv: '7.2' },
+    safetyIndex: 9.5,
+    coordinates: { lat: 29.0588, lng: 76.0856 },
+    budget: { budget: 1700, mid: 4000, luxury: 11000 },
+    bestMonths: 'October – March'
+  },
+
+  // 40. Orchha (Orccha)
+  {
+    name: 'Orchha',
+    state: 'Madhya Pradesh',
+    aliases: ['orchha', 'orccha', 'betwa', 'jahangir mahal', 'ram raja temple', 'chhatris'],
+    biomeCategory: 'river',
+    coverImage: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Majestic Orchha Fort Complex & Multi-Tiered Jahangir Mahal', 'Sacred Ram Raja Temple (Where Lord Rama is Worshipped as King)', 'Scenic Royal Chhatris Cenotaphs on River Betwa Banks', 'Betwa River Kayaking & Bundelkhand Historic Murals'],
+    description: 'A frozen-in-time medieval Bundela capital on the boulders of the Betwa river: imposing stone fortresses, the sacred Ram Raja Temple guarded by state police salutes, and striking river cenotaphs.',
+    highlights: ['Exploring multistoried courtyards of Jahangir Mahal and Raja Mahal', 'Attending guard-of-honor Aarti at Ram Raja Temple', 'Betwa river rafting and sunset photography at the 14 Royal Chhatris', 'Chaturbhuj Temple sky-high rooftop views'],
+    weather: { temp: 27, condition: 'Warm River Heritage', humidity: '38%', uv: '7.5' },
+    safetyIndex: 9.6,
+    coordinates: { lat: 25.3516, lng: 78.6433 },
+    budget: { budget: 1600, mid: 3800, luxury: 10500 },
+    bestMonths: 'October – March'
+  },
+
+  // 41. Bhopal
+  {
+    name: 'Bhopal',
+    state: 'Madhya Pradesh',
+    aliases: ['bhopal', 'city of lakes', 'bada talab', 'sanchi', 'bhimbetka', 'madhya pradesh'],
+    biomeCategory: 'river',
+    coverImage: 'https://images.unsplash.com/photo-1615836245337-f5b9b2303f10?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Upper Lake (Bada Talab) Scenic Waterfront & Boat Club', 'Gateway to UNESCO World Heritage Sanchi Buddhist Stupas', 'Prehistoric Bhimbetka Rock Shelters Cave Art', 'Monumental Taj-ul-Masajid (One of Asia’s Largest Mosques)'],
+    description: 'The City of Lakes: serene water bodies framed by green rolling hills, magnificent twin lakes, pink sandstone minarets of Taj-ul-Masajid, and the gateway to UNESCO sites Sanchi & Bhimbetka.',
+    highlights: ['Sunset boating and water sports on Upper Lake (Bada Talab)', 'Excursion to the 3rd-century BC Great Stupa of Sanchi', 'Viewing 30,000-year-old Paleolithic cave paintings at Bhimbetka', 'Architectural tour of the colossal Taj-ul-Masajid'],
+    weather: { temp: 28, condition: 'Gentle Lake Breeze', humidity: '42%', uv: '7.6' },
+    safetyIndex: 9.5,
+    coordinates: { lat: 23.2599, lng: 77.4126 },
+    budget: { budget: 1800, mid: 4200, luxury: 12000 },
+    bestMonths: 'October – March'
+  },
+
+  // 42. Manipur
+  {
+    name: 'Manipur',
+    state: 'Manipur',
+    aliases: ['manipur', 'imphal', 'loktak', 'loktak lake', 'keibul lamjao', 'kangla'],
+    biomeCategory: 'forest',
+    coverImage: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80',
+    specialties: ['Loktak Lake & Keibul Lamjao (World’s Only Floating National Park)', 'Endangered Brow-Antlered Sangai Dancing Deer', 'Historic Kangla Fort Citadel & Imphal Heritage', 'Ima Keithel (World’s Largest All-Women Run Marketplace)'],
+    description: 'The Jewel of India: the tranquil mirror waters of Loktak Lake with circular floating islands (phumdis), the world’s sole floating national park, and vibrant Meitei martial and cultural arts.',
+    highlights: ['Boating among the floating biomass islands of Loktak Lake', 'Spotting the rare Sangai deer at Keibul Lamjao National Park', 'Shopping traditional handloom shawls at the historic 500-year-old Ima Keithel', 'Exploring ancient royal Kangla Fort ruins in Imphal'],
+    weather: { temp: 20, condition: 'Pleasant Valley Air', humidity: '64%', uv: '6.2' },
+    safetyIndex: 9.3,
+    coordinates: { lat: 24.8170, lng: 93.9368 },
+    budget: { budget: 1900, mid: 4500, luxury: 12500 },
+    bestMonths: 'October – April'
   }
 ];
 
@@ -466,14 +721,29 @@ export function searchStrictLocation(query) {
   ];
   if (invalidWords.includes(q)) return null;
 
-  // Exact or alias match across destinations
-  for (const dest of ALL_INDIAN_DESTINATIONS) {
-    if (dest.name.toLowerCase().includes(q) || 
-        dest.state.toLowerCase().includes(q) ||
-        dest.aliases.some(a => a.toLowerCase().includes(q) || q.includes(a.toLowerCase()))) {
-      return dest;
-    }
-  }
+  // 1. Exact match on name
+  const exactNameMatch = ALL_INDIAN_DESTINATIONS.find(d => d.name.toLowerCase() === q);
+  if (exactNameMatch) return exactNameMatch;
+
+  // 2. Exact match on alias
+  const exactAliasMatch = ALL_INDIAN_DESTINATIONS.find(d => d.aliases.some(a => a.toLowerCase() === q));
+  if (exactAliasMatch) return exactAliasMatch;
+
+  // 3. Substring match on name
+  const subNameMatch = ALL_INDIAN_DESTINATIONS.find(d => d.name.toLowerCase().includes(q));
+  if (subNameMatch) return subNameMatch;
+
+  // 4. Exact state match
+  const exactStateMatch = ALL_INDIAN_DESTINATIONS.find(d => d.state.toLowerCase() === q);
+  if (exactStateMatch) return exactStateMatch;
+
+  // 5. Substring match on state
+  const subStateMatch = ALL_INDIAN_DESTINATIONS.find(d => d.state.toLowerCase().includes(q));
+  if (subStateMatch) return subStateMatch;
+
+  // 6. Substring match on aliases
+  const subAliasMatch = ALL_INDIAN_DESTINATIONS.find(d => d.aliases.some(a => a.toLowerCase().includes(q) || q.includes(a.toLowerCase())));
+  if (subAliasMatch) return subAliasMatch;
 
   return null;
 }
