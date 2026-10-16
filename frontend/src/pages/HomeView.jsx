@@ -242,7 +242,10 @@ export default function HomeView({ onSelectDestination, onPlanTrip, onExploreAll
                 style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
               >
                 {/* Image */}
-                <div style={{ position: 'relative', height: '230px', overflow: 'hidden' }}>
+                <div 
+                  style={{ position: 'relative', height: '230px', overflow: 'hidden' }}
+                  className="group destination-image-container"
+                >
                   <img
                     src={dest.coverImage}
                     alt={dest.name}
@@ -252,9 +255,41 @@ export default function HomeView({ onSelectDestination, onPlanTrip, onExploreAll
                       objectFit: 'cover',
                       transition: 'transform 0.4s ease'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.04)'}
+                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.06)'}
                     onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
                   />
+
+                  {/* Hover Place Name Overlay */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to top, rgba(17,66,50,0.85) 0%, rgba(17,66,50,0.2) 60%, transparent 100%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    padding: '20px',
+                    opacity: 0,
+                    transition: 'opacity 0.3s ease',
+                    pointerEvents: 'none'
+                  }}
+                  className="hover-place-name-overlay"
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = '0'}
+                  >
+                    <div style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      color: 'var(--forest-green)',
+                      fontWeight: 700,
+                      fontSize: '14px',
+                      alignSelf: 'flex-start',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                    }}>
+                      📍 {dest.name}, {dest.state}
+                    </div>
+                  </div>
+
                   <div style={{
                     position: 'absolute',
                     top: '16px',

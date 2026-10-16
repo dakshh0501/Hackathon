@@ -208,3 +208,7 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(56, 189, 248, 0.6);
 }
+
+.destination-image-container:hover .hover-place-name-overlay {
+  opacity: 1 !important;
+}

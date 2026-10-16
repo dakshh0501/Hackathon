@@ -223,6 +223,64 @@ export default function App() {
                     opacity: isHovered || isSelected ? 0.6 : 0.15,
                     transition: 'opacity 0.4s ease'
                   }} />
+
+                  {/* Place Name Hover Indicator Overlay */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '72px',
+                    left: '50%',
+                    transform: isHovered ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(-10px)',
+                    opacity: isHovered ? 1 : 0,
+                    transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                    pointerEvents: 'none',
+                    zIndex: 25,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px',
+                    width: '90%'
+                  }}>
+                    <div style={{
+                      background: 'rgba(8, 14, 24, 0.88)',
+                      backdropFilter: 'blur(16px)',
+                      WebkitBackdropFilter: 'blur(16px)',
+                      border: `1px solid ${biome.accentColor || 'rgba(255,255,255,0.2)'}`,
+                      borderRadius: '12px',
+                      padding: '8px 14px',
+                      textAlign: 'center',
+                      boxShadow: `0 8px 24px rgba(0,0,0,0.6), 0 0 16px ${biome.glowColor || 'transparent'}`,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '2px'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontFamily: 'Syne, sans-serif',
+                        fontWeight: 800,
+                        fontSize: '13px',
+                        letterSpacing: '0.08em',
+                        color: biome.accentColor || '#FFFFFF',
+                        textTransform: 'uppercase'
+                      }}>
+                        <span>{biome.emoji}</span>
+                        <span>{biome.name}</span>
+                      </div>
+                      <div style={{
+                        fontSize: '11px',
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '160px'
+                      }}>
+                        {biome.destinations[0]?.name || biome.tagline}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })}
