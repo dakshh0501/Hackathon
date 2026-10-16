@@ -16,6 +16,7 @@ export default function ItineraryBuilderScreen({ destination, biome, onBack }) {
   const [activeDay, setActiveDay] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [validationResult, setValidationResult] = useState(null);
+  const [generationError, setGenerationError] = useState(null);
 
   // Sample day itinerary blocks
   const [itinerary, setItinerary] = useState([
@@ -36,6 +37,7 @@ export default function ItineraryBuilderScreen({ destination, biome, onBack }) {
   // Connect to Trip Intelligence Engine: Auto-generate
   const handleAutoGenerateBackend = async () => {
     setIsGenerating(true);
+    setGenerationError(null);
     try {
       const res = await api.request('/trips/generate', {
         method: 'POST',
@@ -68,9 +70,12 @@ export default function ItineraryBuilderScreen({ destination, biome, onBack }) {
         setDaysCount(generatedDays.length);
         setActiveDay(0);
         setValidationResult({ score: 98, status: 'Conflict-free & Optimized by Engine' });
+      } else {
+        setGenerationError('The engine did not return any days for this destination.');
       }
     } catch (err) {
-      console.warn('Backend generation fallback:', err);
+      console.warn('Backend generation failed:', err);
+      setGenerationError(err.message || 'Failed to auto-generate itinerary from backend engine.');
     } finally {
       setIsGenerating(false);
     }
@@ -188,6 +193,47 @@ export default function ItineraryBuilderScreen({ destination, biome, onBack }) {
           </div>
         </div>
       </div>
+
+      {/* Generation Error Banner */}
+      {generationError && (
+        <div style={{
+          marginBottom: '20px',
+          padding: '12px 20px',
+          borderRadius: 'var(--radius-md)',
+          backgroundColor: 'rgba(244, 63, 94, 0.15)',
+          border: '1px solid rgba(244, 63, 94, 0.45)',
+          color: '#FDA4AF',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+          fontSize: '13px',
+          fontWeight: 600,
+          boxShadow: '0 8px 24px rgba(244, 63, 94, 0.15)',
+          animation: 'slideUpFade 0.3s ease'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <AlertCircle size={18} color="#F43F5E" />
+            <span>⚠️ {generationError}</span>
+          </div>
+          <button
+            onClick={() => setGenerationError(null)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255, 255, 255, 0.7)',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '12px',
+              padding: '2px 8px',
+              borderRadius: '6px',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)'
+            }}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Main Grid: Days Navigation, Day Timeline, AI Optimization */}
       <div style={{

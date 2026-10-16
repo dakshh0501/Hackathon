@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SKETCH_BIOMES } from './data/sketchBiomes';
 import SketchMascot from './components/SketchMascot';
 import SearchOverlay from './components/SearchOverlay';
@@ -27,6 +27,58 @@ export default function App() {
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // Real backend health check state: 'checking' | 'live' | 'offline'
+  const [backendStatus, setBackendStatus] = useState('checking');
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function checkHealth() {
+      try {
+        const res = await api.getHealth();
+        if (isMounted) {
+          if (res?.data?.status === 'ok' || res?.status === 'ok') {
+            setBackendStatus('live');
+          } else {
+            setBackendStatus('offline');
+          }
+        }
+      } catch {
+        if (isMounted) setBackendStatus('offline');
+      }
+    }
+
+    checkHealth();
+    const interval = setInterval(checkHealth, 15000); // Check every 15s
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Restore authenticated session on page reload
+  useEffect(() => {
+    async function restoreSession() {
+      if (!api.token) return;
+
+      try {
+        const data = await api.getCurrentUser();
+        if (data?.user) {
+          setCurrentUser(data.user);
+        } else if (data?.id) {
+          setCurrentUser(data);
+        }
+      } catch (err) {
+        console.warn('Session expired or invalid token:', err.message);
+        api.setToken(null);
+        setCurrentUser(null);
+      }
+    }
+
+    restoreSession();
+  }, []);
 
   // Active biome object
   const activeBiome = SKETCH_BIOMES.find(b => b.id === (hoveredBiomeId || activeBiomeId)) || SKETCH_BIOMES[2];
@@ -153,20 +205,39 @@ export default function App() {
                 gap: '6px',
                 padding: '4px 12px',
                 borderRadius: '9999px',
-                background: 'rgba(52, 211, 153, 0.12)',
-                border: '1px solid rgba(52, 211, 153, 0.3)',
+                background: backendStatus === 'live' 
+                  ? 'rgba(52, 211, 153, 0.12)' 
+                  : backendStatus === 'offline' 
+                    ? 'rgba(244, 63, 94, 0.15)' 
+                    : 'rgba(251, 191, 36, 0.12)',
+                border: `1px solid ${
+                  backendStatus === 'live' 
+                    ? 'rgba(52, 211, 153, 0.35)' 
+                    : backendStatus === 'offline' 
+                      ? 'rgba(244, 63, 94, 0.4)' 
+                      : 'rgba(251, 191, 36, 0.35)'
+                }`,
                 fontSize: '11px',
                 fontWeight: 700,
-                color: '#34D399'
+                color: backendStatus === 'live' 
+                  ? '#34D399' 
+                  : backendStatus === 'offline' 
+                    ? '#F87171' 
+                    : '#FBBF24',
+                transition: 'all 0.3s ease'
               }}>
                 <span style={{
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
-                  background: '#34D399',
-                  boxShadow: '0 0 8px #34D399'
+                  background: backendStatus === 'live' ? '#34D399' : backendStatus === 'offline' ? '#F87171' : '#FBBF24',
+                  boxShadow: `0 0 8px ${backendStatus === 'live' ? '#34D399' : backendStatus === 'offline' ? '#F87171' : '#FBBF24'}`
                 }} />
-                <span>Backend API Live (Port 4000)</span>
+                <span>
+                  {backendStatus === 'live' && 'Backend API Live (Port 4000)'}
+                  {backendStatus === 'offline' && 'Backend Offline (Port 4000)'}
+                  {backendStatus === 'checking' && 'Connecting to API...'}
+                </span>
               </div>
 
               {currentUser ? (
