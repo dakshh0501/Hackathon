@@ -124,6 +124,19 @@ class ApiClient {
     });
   }
 
+  async updateTrip(tripId, tripData) {
+    return this.request(`/trips/${tripId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(tripData),
+    });
+  }
+
+  async deleteTrip(tripId) {
+    return this.request(`/trips/${tripId}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Auth
   async login(email, password) {
     const data = await this.request('/auth/login', {

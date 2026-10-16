@@ -7,8 +7,10 @@ import DestinationDetailView from './components/DestinationDetailView';
 import ItineraryBuilderScreen from './components/ItineraryBuilderScreen';
 import AIAssistantPanel from './components/AIAssistantPanel';
 import MascotChatbotModal from './components/MascotChatbotModal';
+import ExploreView from './pages/ExploreView';
+import MyTripsView from './pages/MyTripsView';
 import { searchStrictLocation } from './data/allIndiaDestinations';
-import { Compass, Sparkles, User, LogOut } from 'lucide-react';
+import { Compass, Sparkles, User, LogOut, Map, Bookmark } from 'lucide-react';
 import AuthModal from './components/AuthModal';
 import { api } from './services/api';
 
@@ -18,14 +20,17 @@ export default function App() {
   const [hoveredBiomeId, setHoveredBiomeId] = useState(null);
 
   // Detail View and Itinerary Navigation
-  const [viewMode, setViewMode] = useState('MAIN_PAGE'); // 'MAIN_PAGE' | 'DESTINATION_DETAIL' | 'ITINERARY'
+  const [viewMode, setViewMode] = useState('MAIN_PAGE'); // 'MAIN_PAGE' | 'DESTINATION_DETAIL' | 'ITINERARY' | 'EXPLORE' | 'MY_TRIPS'
   const [selectedDestination, setSelectedDestination] = useState(null);
 
   // Overlays
   const [isMapExpanded, setIsMapExpanded] = useState(false);
-  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
+  const [isMascotChatOpen, setIsMascotChatOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [savedTripsList, setSavedTripsList] = useState([]);
+  const [savedAttractionsList, setSavedAttractionsList] = useState([]);
 
   // Real backend health check state: 'checking' | 'live' | 'offline'
   const [backendStatus, setBackendStatus] = useState('checking');
@@ -68,6 +73,21 @@ export default function App() {
           setCurrentUser(data.user);
         } else if (data?.id) {
           setCurrentUser(data);
+        }
+
+        // Fetch user's saved trips from backend store
+        const trips = await api.getTrips();
+        if (Array.isArray(trips)) {
+          setSavedTripsList(trips.map(t => ({
+            id: t.id,
+            destination: t.destinationName || 'Heritage Tour',
+            startDate: t.startDate,
+            endDate: t.endDate,
+            days: t.days?.length || 3,
+            members: t.adults + (t.children || 0),
+            totalCost: t.budgetPaise ? Math.round(t.budgetPaise / 100) : 5000,
+            image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=800&q=80'
+          })));
         }
       } catch (err) {
         console.warn('Session expired or invalid token:', err.message);
@@ -124,7 +144,7 @@ export default function App() {
 
   // Click on mascot action
   const handleMascotClick = () => {
-    setIsAIChatOpen(true);
+    setIsMascotChatOpen(true);
   };
 
   // Click directly on a column
@@ -198,46 +218,60 @@ export default function App() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', pointerEvents: 'auto' }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '4px 12px',
-                borderRadius: '9999px',
-                background: backendStatus === 'live' 
-                  ? 'rgba(52, 211, 153, 0.12)' 
-                  : backendStatus === 'offline' 
-                    ? 'rgba(244, 63, 94, 0.15)' 
-                    : 'rgba(251, 191, 36, 0.12)',
-                border: `1px solid ${
-                  backendStatus === 'live' 
-                    ? 'rgba(52, 211, 153, 0.35)' 
-                    : backendStatus === 'offline' 
-                      ? 'rgba(244, 63, 94, 0.4)' 
-                      : 'rgba(251, 191, 36, 0.35)'
-                }`,
-                fontSize: '11px',
-                fontWeight: 700,
-                color: backendStatus === 'live' 
-                  ? '#34D399' 
-                  : backendStatus === 'offline' 
-                    ? '#F87171' 
-                    : '#FBBF24',
-                transition: 'all 0.3s ease'
-              }}>
-                <span style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: backendStatus === 'live' ? '#34D399' : backendStatus === 'offline' ? '#F87171' : '#FBBF24',
-                  boxShadow: `0 0 8px ${backendStatus === 'live' ? '#34D399' : backendStatus === 'offline' ? '#F87171' : '#FBBF24'}`
-                }} />
-                <span>
-                  {backendStatus === 'live' && 'Backend API Live (Port 4000)'}
-                  {backendStatus === 'offline' && 'Backend Offline (Port 4000)'}
-                  {backendStatus === 'checking' && 'Connecting to API...'}
-                </span>
-              </div>
+              {/* Navigation Menu Buttons */}
+              <button
+                onClick={() => setViewMode('MAIN_PAGE')}
+                className="glass-interactive"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 14px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  background: viewMode === 'MAIN_PAGE' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                  border: viewMode === 'MAIN_PAGE' ? '1px solid var(--accent-primary)' : '1px solid rgba(255, 255, 255, 0.12)'
+                }}
+              >
+                <Compass size={14} color={viewMode === 'MAIN_PAGE' ? 'var(--accent-primary)' : '#FFFFFF'} />
+                <span>Sanctuaries</span>
+              </button>
+
+              <button
+                onClick={() => setViewMode('EXPLORE')}
+                className="glass-interactive"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 14px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  background: viewMode === 'EXPLORE' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                  border: viewMode === 'EXPLORE' ? '1px solid var(--accent-primary)' : '1px solid rgba(255, 255, 255, 0.12)'
+                }}
+              >
+                <Map size={14} color={viewMode === 'EXPLORE' ? 'var(--accent-primary)' : '#FFFFFF'} />
+                <span>Explore All</span>
+              </button>
+
+              <button
+                onClick={() => setViewMode('MY_TRIPS')}
+                className="glass-interactive"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 14px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  background: viewMode === 'MY_TRIPS' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                  border: viewMode === 'MY_TRIPS' ? '1px solid var(--accent-primary)' : '1px solid rgba(255, 255, 255, 0.12)'
+                }}
+              >
+                <Bookmark size={14} color={viewMode === 'MY_TRIPS' ? 'var(--accent-primary)' : '#FFFFFF'} />
+                <span>My Trips</span>
+              </button>
 
               {currentUser ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -283,22 +317,6 @@ export default function App() {
                   <span>Sign In</span>
                 </button>
               )}
-
-              <button
-                onClick={() => setIsAIChatOpen(!isAIChatOpen)}
-                className="glass-interactive"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 16px',
-                  fontSize: '12px',
-                  fontWeight: 700
-                }}
-              >
-                <Sparkles size={14} color="#FBBF24" />
-                <span>AI Companion</span>
-              </button>
             </div>
           </header>
 
@@ -497,19 +515,100 @@ export default function App() {
         </div>
       )}
 
-      {/* Floating Gemini AI Travel Companion Panel */}
+      {/* ========================================================
+          VIEW MODE 4: EXPLORE ALL DESTINATIONS GRID
+          ======================================================== */}
+      {viewMode === 'EXPLORE' && (
+        <div style={{ width: '100%', height: '100%', overflowY: 'auto' }}>
+          <div style={{ padding: '20px 24px 0' }}>
+            <button
+              onClick={() => setViewMode('MAIN_PAGE')}
+              className="glass-interactive"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 18px',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: '#FFFFFF'
+              }}
+            >
+              <Compass size={16} color="var(--accent-primary)" />
+              <span>Back</span>
+            </button>
+          </div>
+          <ExploreView
+            savedAttractions={savedAttractionsList}
+            onToggleSave={(id) => {
+              setSavedAttractionsList(prev => 
+                prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+              );
+            }}
+            onAddToItinerary={(attraction) => {
+              handleSearch(attraction.city);
+            }}
+            onViewDestination={(destName) => {
+              handleSearch(destName);
+            }}
+          />
+        </div>
+      )}
+
+      {/* ========================================================
+          VIEW MODE 5: MY SAVED TRIPS & JOURNAL
+          ======================================================== */}
+      {viewMode === 'MY_TRIPS' && (
+        <div style={{ width: '100%', height: '100%', overflowY: 'auto' }}>
+          <div style={{ padding: '20px 24px 0' }}>
+            <button
+              onClick={() => setViewMode('MAIN_PAGE')}
+              className="glass-interactive"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 18px',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: '#FFFFFF'
+              }}
+            >
+              <Compass size={16} color="var(--accent-primary)" />
+              <span>Back</span>
+            </button>
+          </div>
+          <MyTripsView
+            savedTrips={savedTripsList}
+            savedAttractions={savedAttractionsList}
+            onLoadTrip={(trip) => {
+              handleSearch(trip.destination);
+            }}
+            onDeleteTrip={(tripId) => {
+              setSavedTripsList(prev => prev.filter(t => t.id !== tripId));
+            }}
+            onPlanNewTrip={() => setViewMode('EXPLORE')}
+            onSelectDestination={(dest) => {
+              handleSearch(dest.name);
+            }}
+          />
+        </div>
+      )}
+
+      {/* Floating Gemini AI Travel Companion Panel (Top Right Header Trigger) */}
       <AIAssistantPanel
-        isOpen={isAIChatOpen}
-        onClose={() => setIsAIChatOpen(false)}
+        isOpen={isAIPanelOpen}
+        onClose={() => setIsAIPanelOpen(false)}
         activeDestination={selectedDestination || { name: activeBiome.name }}
         biome={activeBiome}
       />
 
-      {/* Backpack Mascot Travel Chatbot */}
+      {/* Backpack Mascot Travel Chatbot (Bottom Right Mascot Trigger) */}
       <MascotChatbotModal
-        isOpen={isAIChatOpen}
-        onClose={() => setIsAIChatOpen(false)}
+        isOpen={isMascotChatOpen}
+        onClose={() => setIsMascotChatOpen(false)}
         onSelectDestination={(dest) => {
+          setIsMascotChatOpen(false);
           handleSearch(dest.name);
         }}
       />

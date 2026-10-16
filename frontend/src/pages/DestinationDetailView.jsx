@@ -17,7 +17,7 @@ export default function DestinationDetailView({ destination, onBack, onStartPlan
         style={{ marginBottom: '24px', padding: '6px 14px', fontSize: '13px' }}
       >
         <ArrowLeft size={16} />
-        <span>Back to Destinations</span>
+        <span>Back</span>
       </button>
 
       {/* Main Destination Hero Cover */}
