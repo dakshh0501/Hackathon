@@ -199,7 +199,7 @@ export default function App() {
                       backgroundImage: `url(${biome.bgImage})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
-                      filter: isHovered || isSelected ? 'brightness(0.85) contrast(1.1)' : 'brightness(0.55) contrast(1.0)',
+                      filter: isHovered || isSelected ? 'brightness(1.0) contrast(1.12) saturate(1.1)' : 'brightness(0.82) contrast(1.08) saturate(1.05)',
                       transform: isHovered ? 'scale(1.06)' : 'scale(1.0)',
                       transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
                     }}
@@ -209,7 +209,7 @@ export default function App() {
                   <div style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'linear-gradient(180deg, rgba(4,6,8,0.3) 0%, transparent 40%, rgba(4,6,8,0.5) 100%)'
+                    background: 'linear-gradient(180deg, rgba(4,6,8,0.15) 0%, transparent 40%, rgba(4,6,8,0.3) 100%)'
                   }} />
 
                   {/* Active column ambient bottom glow line */}

@@ -8,7 +8,7 @@ export const SKETCH_BIOMES = [
     accentColor: '#D97706',
     glowColor: 'rgba(217, 119, 6, 0.5)',
     tagline: 'Vast golden dunes & starlit stillness',
-    bgImage: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1600&q=80',
+    bgImage: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1920&q=85',
     destinations: [
       { name: 'Thar Desert, Rajasthan', temp: '32°C', rating: '4.9', visitors: '1.2M' },
       { name: 'Sahara & Merzouga', temp: '34°C', rating: '4.8', visitors: '2.1M' }

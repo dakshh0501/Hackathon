@@ -9,7 +9,7 @@ export const BIOMES = [
     secondaryColor: '#B45309',
     gradientCss: 'radial-gradient(ellipse at top, #92400E 0%, #1C0A00 70%)',
     atmosphericEffect: 'Heat shimmer distortion & blowing golden sand particles',
-    bgImage: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=2400&q=85',
+    bgImage: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=2400&q=85',
     destinationCount: 14,
     climateTags: ['Arid', 'Dry', 'Extreme Sun', 'Cold Nights'],
     avgTemp: '34°C / 93°F',
