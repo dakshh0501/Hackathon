@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, Compass, Sparkles, ArrowRight, X, MapPin } from 'lucide-react';
 import { SKETCH_BIOMES } from '../data/sketchBiomes';
 import { api } from '../services/api';
@@ -12,9 +12,15 @@ export default function SearchOverlay({ onSearch, activeBiome, searchError }) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [liveSuggestions, setLiveSuggestions] = useState([]);
+  const isSelectionRef = useRef(false);
 
   // Fetch real-time suggestions from backend
   useEffect(() => {
+    if (isSelectionRef.current) {
+      isSelectionRef.current = false;
+      return;
+    }
+
     if (!query.trim() || query.length < 2) {
       setLiveSuggestions([]);
       return;
@@ -37,12 +43,14 @@ export default function SearchOverlay({ onSearch, activeBiome, searchError }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim()) {
+      isSelectionRef.current = true;
       setLiveSuggestions([]);
       onSearch(query.trim());
     }
   };
 
   const handleSelectSuggestion = (destName) => {
+    isSelectionRef.current = true;
     setQuery(destName);
     setLiveSuggestions([]);
     onSearch(destName);
