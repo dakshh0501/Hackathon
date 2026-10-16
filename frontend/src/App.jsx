@@ -1,438 +1,360 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import HomeView from './pages/HomeView';
-import ExploreView from './pages/ExploreView';
-import DestinationDetailView from './pages/DestinationDetailView';
-import TripPlannerView from './pages/TripPlannerView';
-import ItineraryView from './pages/ItineraryView';
-import BudgetView from './pages/BudgetView';
-import MyTripsView from './pages/MyTripsView';
-import { DEFAULT_TRIP, DESTINATIONS, ATTRACTIONS } from './data/travelData';
-import { Compass, CheckCircle } from 'lucide-react';
+import LandscapeBackground from './components/LandscapeBackground';
+import DuffelBagMascot from './components/DuffelBagMascot';
+import ExplorerCharacter from './components/ExplorerCharacter';
+import DestinationSearch from './components/DestinationSearch';
+import DestinationDiscoveryScene from './components/DestinationDiscoveryScene';
+import { searchDestinationData } from './data/immersiveDestinations';
+import { Compass, Sparkles, MapPin, RefreshCw } from 'lucide-react';
 
-const STORAGE_KEY = 'traveltales_data_v1';
-
+/**
+ * Immersive Animated Travel Discovery Website
+ * Orchestrates explicit animation states:
+ * WELCOME -> SEARCH -> DESTINATION_INTRO -> DESTINATION_DISCOVERY
+ */
 export default function App() {
-  // Active Navigation Page
-  const [activePage, setActivePage] = useState('home');
-  const [selectedDestination, setSelectedDestination] = useState(null);
-  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
-  const [toastMessage, setToastMessage] = useState(null);
+  // Current animation scene
+  const [activeScene, setActiveScene] = useState('WELCOME');
+  // Discovered destination data
+  const [activeDestination, setActiveDestination] = useState(null);
+  // Search loading & error
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState(null);
+  // Mouse parallax coordinates
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 
-  // Load from local storage or default
-  const [tripConfig, setTripConfig] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved).tripConfig;
-    } catch (e) {
-      console.warn('Storage read failed', e);
-    }
-    return DEFAULT_TRIP;
-  });
-
-  const [savedTrips, setSavedTrips] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved).savedTrips || [];
-    } catch (e) {
-      console.warn('Storage read failed', e);
-    }
-    return DEFAULT_TRIP.savedTrips;
-  });
-
-  const [savedAttractions, setSavedAttractions] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved).savedAttractions || [];
-    } catch (e) {
-      console.warn('Storage read failed', e);
-    }
-    return DEFAULT_TRIP.savedAttractions;
-  });
-
-  const [checklist, setChecklist] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved).checklist || [];
-    } catch (e) {
-      console.warn('Storage read failed', e);
-    }
-    return DEFAULT_TRIP.checklist;
-  });
-
-  const [notes, setNotes] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved).notes || '';
-    } catch (e) {
-      console.warn('Storage read failed', e);
-    }
-    return DEFAULT_TRIP.notes;
-  });
-
-  // Sync state to LocalStorage
+  // Subtle mouse parallax tracker for desktop screens
   useEffect(() => {
-    try {
-      const payload = {
-        tripConfig,
-        savedTrips,
-        savedAttractions,
-        checklist,
-        notes
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    } catch (e) {
-      console.warn('Storage write failed', e);
-    }
-  }, [tripConfig, savedTrips, savedAttractions, checklist, notes]);
-
-  // Toast Notification helper
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  // Ensure plan array matches the number of days
-  const fitPlanToDays = (plan, targetDays) => {
-    const newPlan = [...plan];
-    while (newPlan.length < targetDays) {
-      newPlan.push([]);
-    }
-    while (newPlan.length > targetDays) {
-      const overflow = newPlan.pop();
-      if (newPlan.length > 0 && overflow.length > 0) {
-        newPlan[newPlan.length - 1].push(...overflow);
-      }
-    }
-    return newPlan;
-  };
-
-  // Handler: Update Trip Config from Planner
-  const handleUpdateTrip = (newSettings) => {
-    const updatedPlan = fitPlanToDays(tripConfig.plan, newSettings.days);
-    setTripConfig({
-      ...tripConfig,
-      ...newSettings,
-      plan: updatedPlan
-    });
-    if (selectedDayIndex >= newSettings.days) {
-      setSelectedDayIndex(0);
-    }
-    showToast(`Trip configured for ${newSettings.city}!`);
-  };
-
-  // Handler: Add attraction to a specific day
-  const handleAddToItinerary = (attractionId, dayIndex) => {
-    const currentPlan = [...tripConfig.plan];
-    while (currentPlan.length <= dayIndex) {
-      currentPlan.push([]);
-    }
-    // Check if sight already in that day
-    if (currentPlan[dayIndex].includes(attractionId)) {
-      showToast('Attraction already in Day ' + (dayIndex + 1));
-      return;
-    }
-    currentPlan[dayIndex].push(attractionId);
-    setTripConfig({ ...tripConfig, plan: currentPlan });
-    const sight = ATTRACTIONS.find(a => a.id === attractionId);
-    showToast(`Added ${sight?.name || 'Attraction'} to Day ${dayIndex + 1}`);
-  };
-
-  // Handler: Remove activity from day
-  const handleRemoveActivity = (dayIndex, actIndex) => {
-    const currentPlan = [...tripConfig.plan];
-    if (currentPlan[dayIndex]) {
-      currentPlan[dayIndex].splice(actIndex, 1);
-      setTripConfig({ ...tripConfig, plan: currentPlan });
-      showToast('Removed from itinerary');
-    }
-  };
-
-  // Handler: Move activity up or down
-  const handleMoveActivity = (dayIndex, actIndex, direction) => {
-    const currentPlan = [...tripConfig.plan];
-    const day = [...currentPlan[dayIndex]];
-    const targetIndex = actIndex + direction;
-    if (targetIndex >= 0 && targetIndex < day.length) {
-      const temp = day[actIndex];
-      day[actIndex] = day[targetIndex];
-      day[targetIndex] = temp;
-      currentPlan[dayIndex] = day;
-      setTripConfig({ ...tripConfig, plan: currentPlan });
-    }
-  };
-
-  // Handler: Clear all days
-  const handleClearPlan = () => {
-    const emptyPlan = Array.from({ length: tripConfig.days }).map(() => []);
-    setTripConfig({ ...tripConfig, plan: emptyPlan });
-    showToast('All days cleared');
-  };
-
-  // Handler: Toggle saved bookmark attraction
-  const handleToggleSaveAttraction = (id) => {
-    let updated;
-    if (savedAttractions.includes(id)) {
-      updated = savedAttractions.filter(x => x !== id);
-      showToast('Removed bookmark');
-    } else {
-      updated = [...savedAttractions, id];
-      showToast('Added to bookmarks');
-    }
-    setSavedAttractions(updated);
-  };
-
-  // Handler: Save current configured trip to My Trips
-  const handleSaveCurrentTrip = () => {
-    const newSaved = {
-      id: 'trip-' + Date.now(),
-      city: tripConfig.city,
-      startDate: tripConfig.startDate,
-      days: tripConfig.days,
-      travelers: tripConfig.travelers,
-      plan: tripConfig.plan,
-      budgetTier: tripConfig.budgetTier,
-      createdAt: new Date().toISOString().slice(0, 10)
+    const handleMouseMove = (e) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      setMouseOffset({
+        x: (e.clientX - centerX) * 0.4,
+        y: (e.clientY - centerY) * 0.4
+      });
     };
-    setSavedTrips([newSaved, ...savedTrips]);
-    showToast('Saved current journey to My Trips!');
-  };
 
-  // Handler: Load a saved trip
-  const handleLoadTrip = (trip) => {
-    setTripConfig({
-      city: trip.city,
-      startDate: trip.startDate,
-      days: trip.days,
-      travelers: trip.travelers,
-      budgetTier: trip.budgetTier || 'comfort',
-      plan: fitPlanToDays(trip.plan, trip.days)
-    });
-    setActivePage('itinerary');
-    showToast(`Loaded ${trip.city} itinerary!`);
-  };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
-  // Handler: Delete a saved trip
-  const handleDeleteTrip = (id) => {
-    setSavedTrips(savedTrips.filter(t => t.id !== id));
-    showToast('Trip deleted from journal');
-  };
-
-  // Handler: Toggle checklist item
-  const handleToggleChecklist = (id) => {
-    setChecklist(checklist.map(c => c.id === id ? { ...c, done: !c.done } : c));
-  };
-
-  // Handler: Add new checklist item
-  const handleAddChecklist = (text) => {
-    const newItem = { id: Date.now(), text, done: false };
-    setChecklist([...checklist, newItem]);
-    showToast('Added to checklist');
-  };
-
-  // Handler: Select destination for detail view
-  const handleSelectDestination = (dest) => {
-    setSelectedDestination(dest);
-    setActivePage('destination-detail');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Handler: Start planning trip with pre-selected city
-  const handlePlanForCity = (cityName) => {
-    if (cityName) {
-      setTripConfig({ ...tripConfig, city: cityName });
+  // Handler: Click Duffel Bag on Welcome Screen
+  const handleBagClick = () => {
+    if (activeScene === 'WELCOME') {
+      // Scene transition: Bag moves to sidebar and explorer enters
+      setActiveScene('SEARCH');
     }
-    setActivePage('planner');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handler: Destination search trigger
+  const handleSearchDestination = (query) => {
+    setIsSearching(true);
+    setSearchError(null);
+
+    // Explorer looks through binoculars
+    setActiveScene('DESTINATION_INTRO');
+
+    setTimeout(() => {
+      const result = searchDestinationData(query);
+      if (result) {
+        setActiveDestination(result);
+        setActiveScene('DESTINATION_DISCOVERY');
+      } else {
+        setSearchError(`No expedition records found for "${query}". Try "Jammu & Kashmir", "Jaipur", "Agra", or "Rishikesh".`);
+        setActiveScene('SEARCH');
+      }
+      setIsSearching(false);
+    }, 750);
+  };
+
+  // Handler: Search another destination
+  const handleResetToSearch = () => {
+    setActiveDestination(null);
+    setSearchError(null);
+    setActiveScene('SEARCH');
+  };
+
+  // Handler: Full reset to welcome screen
+  const handleRestartJourney = () => {
+    setActiveDestination(null);
+    setSearchError(null);
+    setActiveScene('WELCOME');
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Top Editorial Navbar */}
-      <Navbar
-        activePage={activePage}
-        setActivePage={(p) => {
-          setActivePage(p);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        savedCount={savedAttractions.length}
-        tripDays={tripConfig.days}
-        currentCity={tripConfig.city}
+    <div style={{
+      position: 'relative',
+      width: '100vw',
+      minHeight: '100vh',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      {/* 1. Animated Landscape Background with Layered Parallax */}
+      <LandscapeBackground
+        activeScene={activeScene}
+        activeDestination={activeDestination}
+        parallaxOffset={mouseOffset}
       />
 
-      {/* Main Page Views Router */}
-      <main style={{ flexGrow: 1 }}>
-        {activePage === 'home' && (
-          <HomeView
-            onSelectDestination={handleSelectDestination}
-            onPlanTrip={handlePlanForCity}
-            onExploreAll={() => {
-              setActivePage('explore');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          />
+      {/* 2. Top Header & Branding (Always desktop-cinematic) */}
+      <header style={{
+        position: 'relative',
+        zIndex: 50,
+        padding: '24px 40px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        {/* Brand Logo */}
+        <div
+          onClick={handleRestartJourney}
+          style={{
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
+            padding: '8px 20px',
+            borderRadius: '9999px',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+            border: '1px solid rgba(255, 255, 255, 0.9)'
+          }}
+        >
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
+            backgroundColor: '#114232',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#FFFFFF'
+          }}>
+            <Compass size={20} />
+          </div>
+          <div>
+            <div style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: '20px',
+              fontWeight: 800,
+              color: '#114232',
+              lineHeight: 1
+            }}>
+              Travel<span style={{ color: '#C85A32' }}>Tales</span>
+            </div>
+            <div style={{ fontSize: '10px', fontWeight: 700, color: '#6B7068', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              Immersive Animated Expedition
+            </div>
+          </div>
+        </div>
+
+        {/* Top Right State Badges / Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {activeScene !== 'WELCOME' && (
+            <button
+              onClick={handleRestartJourney}
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                color: '#114232',
+                border: '1px solid #E7DFD3',
+                borderRadius: '9999px',
+                padding: '8px 16px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                backdropFilter: 'blur(8px)'
+              }}
+            >
+              <RefreshCw size={13} />
+              <span>Reset to Beginning</span>
+            </button>
+          )}
+
+          <div style={{
+            backgroundColor: 'rgba(17, 66, 50, 0.85)',
+            color: '#FFFFFF',
+            padding: '8px 18px',
+            borderRadius: '9999px',
+            fontSize: '12px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            backdropFilter: 'blur(8px)'
+          }}>
+            <Sparkles size={14} color="#FBBF24" />
+            <span>
+              {activeScene === 'WELCOME' && 'Scene 1: Living Mascot'}
+              {activeScene === 'SEARCH' && 'Scene 2: Explorer Encounter'}
+              {activeScene === 'DESTINATION_INTRO' && 'Scene 3: Surveying Region'}
+              {activeScene === 'DESTINATION_DISCOVERY' && `Scene 4: ${activeDestination?.name}`}
+            </span>
+          </div>
+        </div>
+      </header>
+
+      {/* 3. Main Stage Content Area */}
+      <main style={{
+        position: 'relative',
+        zIndex: 20,
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        padding: '0 40px 40px'
+      }}>
+        {/* ========================================================
+            SCENE 1: WELCOME SCREEN (Center Living Duffel Bag Mascot)
+            ======================================================== */}
+        {activeScene === 'WELCOME' && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            animation: 'fadeInScale 0.6s ease'
+          }}>
+            {/* Editorial Title */}
+            <h1 style={{
+              fontSize: 'clamp(44px, 5.5vw, 68px)',
+              fontFamily: 'Playfair Display, serif',
+              color: '#FFFFFF',
+              fontWeight: 800,
+              textShadow: '0 4px 20px rgba(0, 0, 0, 0.6)',
+              margin: '0 0 12px 0',
+              lineHeight: 1.1
+            }}>
+              Every journey begins with a packed bag.
+            </h1>
+
+            <p style={{
+              fontSize: '18px',
+              color: '#F4EDE4',
+              maxWidth: '600px',
+              margin: '0 0 32px 0',
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.7)',
+              fontWeight: 400
+            }}>
+              Meet your animated travel companion. Tap the duffel bag to awaken the journey across magnificent horizons.
+            </p>
+
+            {/* Central Animated Living Duffel Bag */}
+            <div style={{ position: 'relative', marginBottom: '24px' }}>
+              <DuffelBagMascot
+                isSidebar={false}
+                onClick={handleBagClick}
+                activeScene={activeScene}
+              />
+            </div>
+
+            {/* Subtle Interactive Instruction Pill */}
+            <div
+              onClick={handleBagClick}
+              className="pulse-instruction"
+              style={{
+                cursor: 'pointer',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                color: '#114232',
+                padding: '12px 28px',
+                borderRadius: '9999px',
+                fontSize: '14px',
+                fontWeight: 800,
+                letterSpacing: '0.02em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                backdropFilter: 'blur(8px)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
+            >
+              <Sparkles size={16} color="#D97706" />
+              <span>Click the bag to begin your journey</span>
+            </div>
+          </div>
         )}
 
-        {activePage === 'explore' && (
-          <ExploreView
-            onAddToItinerary={handleAddToItinerary}
-            savedAttractions={savedAttractions}
-            onToggleSave={handleToggleSaveAttraction}
-            selectedDayIndex={selectedDayIndex}
-            setSelectedDayIndex={setSelectedDayIndex}
-            totalTripDays={tripConfig.days}
-            onViewDestination={handleSelectDestination}
-          />
+        {/* ========================================================
+            SCENE 2 & 3: SEARCH INTERACTION & EXPLORER CHARACTER
+            ======================================================== */}
+        {(activeScene === 'SEARCH' || activeScene === 'DESTINATION_INTRO') && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            maxWidth: '960px',
+            margin: '0 auto',
+            textAlign: 'center'
+          }}>
+            {/* Friendly Explorer Character in the center */}
+            <div style={{ marginBottom: '16px' }}>
+              <ExplorerCharacter
+                state={activeScene === 'DESTINATION_INTRO' ? 'SEARCHING' : 'IDLE'}
+              />
+            </div>
+
+            {/* Main Destination Search Interface */}
+            <DestinationSearch
+              onSearch={handleSearchDestination}
+              isLoading={isSearching}
+              searchError={searchError}
+            />
+          </div>
         )}
 
-        {activePage === 'destination-detail' && (
-          <DestinationDetailView
-            destination={selectedDestination}
-            onBack={() => setActivePage('home')}
-            onStartPlanning={handlePlanForCity}
-            onAddToDay={(attractionId, day) => handleAddToItinerary(attractionId, day)}
-          />
-        )}
-
-        {activePage === 'planner' && (
-          <TripPlannerView
-            tripConfig={tripConfig}
-            onUpdateTrip={handleUpdateTrip}
-            onProceedToItinerary={() => {
-              setActivePage('itinerary');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          />
-        )}
-
-        {activePage === 'itinerary' && (
-          <ItineraryView
-            tripConfig={tripConfig}
-            onRemoveActivity={handleRemoveActivity}
-            onMoveActivity={handleMoveActivity}
-            onClearPlan={handleClearPlan}
-            onAddFromExplore={() => {
-              setActivePage('explore');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            checklist={checklist}
-            onToggleChecklist={handleToggleChecklist}
-            onAddChecklist={handleAddChecklist}
-            notes={notes}
-            onChangeNotes={setNotes}
-            onSaveTrip={handleSaveCurrentTrip}
-          />
-        )}
-
-        {activePage === 'budget' && (
-          <BudgetView
-            tripConfig={tripConfig}
-            onProceedToPlanner={() => setActivePage('planner')}
-            onProceedToItinerary={() => setActivePage('itinerary')}
-          />
-        )}
-
-        {activePage === 'my-trips' && (
-          <MyTripsView
-            savedTrips={savedTrips}
-            onLoadTrip={handleLoadTrip}
-            onDeleteTrip={handleDeleteTrip}
-            savedAttractions={savedAttractions}
-            onToggleSaveAttraction={handleToggleSaveAttraction}
-            onPlanNewTrip={() => setActivePage('planner')}
-            onSelectDestination={handleSelectDestination}
+        {/* ========================================================
+            SCENE 4: DESTINATION DISCOVERY GALLERY
+            ======================================================== */}
+        {activeScene === 'DESTINATION_DISCOVERY' && activeDestination && (
+          <DestinationDiscoveryScene
+            destination={activeDestination}
+            onSearchAgain={handleResetToSearch}
           />
         )}
       </main>
 
-      {/* Editorial Footer */}
-      <footer style={{
-        backgroundColor: '#114232',
-        color: '#FAF6ED',
-        padding: '50px 20px 30px',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        marginTop: 'auto'
-      }}>
-        <div className="app-container" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: '36px',
-          marginBottom: '40px'
-        }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <Compass size={22} color="var(--terracotta)" />
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 800 }}>
-                Travel<span style={{ color: 'var(--terracotta)' }}>Tales</span>
-              </div>
-            </div>
-            <p style={{ fontSize: '13px', color: '#B4C5BD', lineHeight: 1.6, maxWidth: '300px' }}>
-              Every journey tells a story. Dedicated to local cultural tourism, heritage discovery, and multi-day experiential trip planning across India.
-            </p>
-          </div>
-
-          <div>
-            <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px', color: 'var(--gold-accent)' }}>
-              Destinations
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#B4C5BD' }}>
-              {DESTINATIONS.slice(0, 4).map(d => (
-                <span
-                  key={d.id}
-                  onClick={() => handleSelectDestination(d)}
-                  style={{ cursor: 'pointer', transition: 'color 0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
-                  onMouseOut={(e) => e.currentTarget.style.color = '#B4C5BD'}
-                >
-                  {d.name} ({d.state})
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px', color: 'var(--gold-accent)' }}>
-              Quick Navigation
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#B4C5BD' }}>
-              <span onClick={() => setActivePage('home')} style={{ cursor: 'pointer' }}>Home Overview</span>
-              <span onClick={() => setActivePage('explore')} style={{ cursor: 'pointer' }}>Attractions Directory</span>
-              <span onClick={() => setActivePage('planner')} style={{ cursor: 'pointer' }}>Custom Trip Planner</span>
-              <span onClick={() => setActivePage('budget')} style={{ cursor: 'pointer' }}>Expense Estimator</span>
-            </div>
-          </div>
-
-          <div>
-            <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px', color: 'var(--gold-accent)' }}>
-              Travelers' Note
-            </div>
-            <p style={{ fontSize: '12px', color: '#A0B4AB', lineHeight: 1.6 }}>
-              Monument timings and entry tariffs are verified against domestic tourism guidelines. Verify seasonal temple rituals prior to your journey.
-            </p>
-          </div>
-        </div>
-
-        <div className="app-container" style={{
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          paddingTop: '20px',
+      {/* Persistent Animated Mascot & Explorer Companion in Lower Left when past Welcome */}
+      {activeScene !== 'WELCOME' && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          left: '28px',
+          zIndex: 40,
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
+          alignItems: 'flex-end',
           gap: '12px',
-          fontSize: '12px',
-          color: '#8CA197'
+          animation: 'slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards'
         }}>
-          <div>© {new Date().getFullYear()} TravelTales India. Built for local tourism hackathon.</div>
-          <div>Warm Ivory • Forest Green • Muted Terracotta</div>
-        </div>
-      </footer>
+          {/* Scaled-down animated duffel bag companion */}
+          <div
+            onClick={() => {
+              if (activeScene === 'DESTINATION_DISCOVERY') handleResetToSearch();
+            }}
+            title="Your trusty duffel companion"
+            style={{ cursor: 'pointer' }}
+          >
+            <DuffelBagMascot
+              isSidebar={true}
+              onClick={() => {}}
+              activeScene={activeScene}
+            />
+          </div>
 
-      {/* Floating Toast Notice */}
-      {toastMessage && (
-        <div className="toast-notice">
-          <CheckCircle size={18} color="#A7F3D0" />
-          <span>{toastMessage}</span>
+          {/* Explorer in discovery presentation pose when viewing details */}
+          {activeScene === 'DESTINATION_DISCOVERY' && (
+            <div style={{ transform: 'scale(0.85)', transformOrigin: 'bottom left' }}>
+              <ExplorerCharacter state="DISCOVERY" />
+            </div>
+          )}
         </div>
       )}
     </div>
