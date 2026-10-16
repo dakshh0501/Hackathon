@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Search, Compass, Sparkles, ArrowRight, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Compass, Sparkles, ArrowRight, X, MapPin } from 'lucide-react';
 import { SKETCH_BIOMES } from '../data/sketchBiomes';
+import { api } from '../services/api';
 
 /**
  * Center "Search Overlay"
@@ -10,12 +11,41 @@ import { SKETCH_BIOMES } from '../data/sketchBiomes';
 export default function SearchOverlay({ onSearch, activeBiome, searchError }) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [liveSuggestions, setLiveSuggestions] = useState([]);
+
+  // Fetch real-time suggestions from backend
+  useEffect(() => {
+    if (!query.trim() || query.length < 2) {
+      setLiveSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const results = await api.suggestDestinations(query.trim());
+        if (Array.isArray(results)) {
+          setLiveSuggestions(results.slice(0, 4));
+        }
+      } catch {
+        // Fallback silently if offline
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim()) {
+      setLiveSuggestions([]);
       onSearch(query.trim());
     }
+  };
+
+  const handleSelectSuggestion = (destName) => {
+    setQuery(destName);
+    setLiveSuggestions([]);
+    onSearch(destName);
   };
 
   return (
@@ -101,6 +131,50 @@ export default function SearchOverlay({ onSearch, activeBiome, searchError }) {
           </button>
         </div>
       </form>
+
+      {/* Live Backend Suggestions Dropdown */}
+      {liveSuggestions.length > 0 && (
+        <div style={{
+          marginTop: '10px',
+          background: 'rgba(8, 14, 24, 0.94)',
+          backdropFilter: 'blur(24px)',
+          border: '1px solid rgba(56, 189, 248, 0.3)',
+          borderRadius: '16px',
+          padding: '8px',
+          boxShadow: '0 16px 36px rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+          animation: 'slideUpFade 0.25s ease'
+        }}>
+          {liveSuggestions.map((dest) => (
+            <div
+              key={dest.id}
+              onClick={() => handleSelectSuggestion(dest.name)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                transition: 'background 0.2s ease',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <MapPin size={16} color="var(--accent-primary)" />
+                <span style={{ fontWeight: 700, fontSize: '14px', color: '#FFFFFF' }}>{dest.name}</span>
+                <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>{dest.state}</span>
+              </div>
+              <span style={{ fontSize: '11px', color: 'var(--accent-primary)', textTransform: 'uppercase', fontWeight: 600 }}>
+                {dest.tagline ? 'Verified' : 'Explore'} →
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Invalid Location Warning Message */}
       {searchError && (

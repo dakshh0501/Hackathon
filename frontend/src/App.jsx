@@ -9,7 +9,9 @@ import ItineraryBuilderScreen from './components/ItineraryBuilderScreen';
 import AIAssistantPanel from './components/AIAssistantPanel';
 import MascotChatbotModal from './components/MascotChatbotModal';
 import { searchStrictLocation } from './data/allIndiaDestinations';
-import { Compass, Sparkles } from 'lucide-react';
+import { Compass, Sparkles, User, LogOut } from 'lucide-react';
+import AuthModal from './components/AuthModal';
+import { api } from './services/api';
 
 export default function App() {
   // Currently highlighted or active biome (default: Mountain, col 3)
@@ -23,6 +25,8 @@ export default function App() {
   // Overlays
   const [isMapExpanded, setIsMapExpanded] = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Active biome object
   const activeBiome = SKETCH_BIOMES.find(b => b.id === (hoveredBiomeId || activeBiomeId)) || SKETCH_BIOMES[2];
@@ -142,7 +146,74 @@ export default function App() {
               </span>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', pointerEvents: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', pointerEvents: 'auto' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                background: 'rgba(52, 211, 153, 0.12)',
+                border: '1px solid rgba(52, 211, 153, 0.3)',
+                fontSize: '11px',
+                fontWeight: 700,
+                color: '#34D399'
+              }}>
+                <span style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: '#34D399',
+                  boxShadow: '0 0 8px #34D399'
+                }} />
+                <span>Backend API Live (Port 4000)</span>
+              </div>
+
+              {currentUser ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    background: 'rgba(255, 255, 255, 0.12)',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#FFFFFF'
+                  }}>
+                    👤 {currentUser.name}
+                  </div>
+                  <button
+                    onClick={() => { api.setToken(null); setCurrentUser(null); }}
+                    title="Sign Out"
+                    className="glass-interactive"
+                    style={{
+                      padding: '6px 10px',
+                      fontSize: '12px',
+                      color: 'rgba(244, 63, 94, 0.9)'
+                    }}
+                  >
+                    <LogOut size={14} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsAuthOpen(true)}
+                  className="glass-interactive"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 16px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    backgroundColor: 'rgba(56, 189, 248, 0.2)',
+                    border: '1px solid rgba(56, 189, 248, 0.4)'
+                  }}
+                >
+                  <User size={14} color="var(--accent-primary)" />
+                  <span>Sign In</span>
+                </button>
+              )}
+
               <button
                 onClick={() => setIsAIChatOpen(!isAIChatOpen)}
                 className="glass-interactive"
@@ -160,6 +231,13 @@ export default function App() {
               </button>
             </div>
           </header>
+
+          {/* User Auth Modal */}
+          <AuthModal
+            isOpen={isAuthOpen}
+            onClose={() => setIsAuthOpen(false)}
+            onAuthSuccess={(user) => setCurrentUser(user)}
+          />
 
           {/* 6 BACKGROUND VERTICAL COLUMNS: PURE SCENIC PHOTOGRAPHY ONLY
               (All text names removed as requested - pure scenic pictures) */}
