@@ -1,19 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, Star, CloudSun, Calendar, Shield, DollarSign, 
-  MapPin, CheckCircle, Navigation, Compass, Sparkles, Heart, Share2, Layers
+  MapPin, CheckCircle, Navigation, Compass, Sparkles, Heart, Share2, Layers, Image as ImageIcon, Camera, RefreshCw
 } from 'lucide-react';
+import { api } from '../services/api';
 
 /**
  * Section 10.2: Destination Detail View
  * Split view layout:
- * - Left Panel (Scrollable content): Hero video/photo, weather widget, 12-month calendar,
- *   story cards, experiences, and budget calculator.
+ * - Left Panel (Scrollable content): Hero photo, weather widget, 12-month calendar,
+ *   story cards, experiences, and live Unsplash photographic gallery.
  * - Right Panel (Sticky map + Quick Book CTA + Wishlist).
  */
 export default function DestinationDetailView({ destination, biome, onBack, onPlanItinerary }) {
   const [activeTab, setActiveTab] = useState('overview'); // overview, stories, experiences, budget
   const [isSaved, setIsSaved] = useState(false);
+  const [heroImage, setHeroImage] = useState(destination?.image);
+  const [destinationPhotos, setDestinationPhotos] = useState([]);
+  const [isLoadingPhotos, setIsLoadingPhotos] = useState(false);
+
+  // Sync hero image whenever destination changes or when live Unsplash image loads
+  useEffect(() => {
+    if (destination?.image) {
+      setHeroImage(destination.image);
+    }
+  }, [destination?.image]);
+
+  // Automatically fetch live Unsplash photos of the city and its sights
+  useEffect(() => {
+    let isMounted = true;
+    async function loadCityPhotos() {
+      if (!destination?.name) return;
+      setIsLoadingPhotos(true);
+      try {
+        const query = `${destination.name} ${destination.country || ''}`.trim();
+        const photos = await api.searchPhotos(query, 8);
+        if (isMounted && photos && photos.length > 0) {
+          setDestinationPhotos(photos);
+        }
+      } catch (err) {
+        console.warn('Could not load destination photos:', err);
+      } finally {
+        if (isMounted) setIsLoadingPhotos(false);
+      }
+    }
+
+    loadCityPhotos();
+    return () => { isMounted = false; };
+  }, [destination?.name]);
 
   if (!destination) return null;
 
@@ -104,9 +138,9 @@ export default function DestinationDetailView({ destination, biome, onBack, onPl
         boxShadow: '0 25px 60px rgba(0, 0, 0, 0.5)'
       }}>
         <img
-          src={destination.image}
+          src={heroImage || destination.image}
           alt={destination.name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'all 0.5s ease' }}
         />
         <div style={{
           position: 'absolute',
@@ -210,6 +244,87 @@ export default function DestinationDetailView({ destination, biome, onBack, onPl
       }}>
         {/* Left Scrollable Information */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          {/* Real Unsplash City Photographic Gallery */}
+          <div className="glass-panel" style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '18px', fontFamily: 'var(--font-display)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Camera size={20} color="var(--accent-primary)" />
+                <span>Real City Gallery & Sights ({destination.name})</span>
+              </h3>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                Powered by Unsplash
+              </span>
+            </div>
+
+            {isLoadingPhotos ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '40px', color: 'var(--text-secondary)' }}>
+                <RefreshCw size={18} className="spin-animation" />
+                <span>Fetching live photographs of {destination.name}...</span>
+              </div>
+            ) : destinationPhotos.length === 0 ? (
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0 }}>
+                Live photos are loading for this destination...
+              </p>
+            ) : (
+              <div>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+                  Click any photo below to set it as the main destination banner view:
+                </p>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+                  gap: '12px'
+                }}>
+                  {destinationPhotos.map(photo => {
+                    const isCurrent = (heroImage === photo.regularUrl || heroImage === photo.url);
+                    return (
+                      <div
+                        key={photo.id}
+                        className="glass-panel"
+                        onClick={() => setHeroImage(photo.regularUrl || photo.url)}
+                        style={{
+                          position: 'relative',
+                          height: '110px',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          cursor: 'pointer',
+                          border: isCurrent ? '2px solid var(--accent-primary)' : '1px solid rgba(255, 255, 255, 0.12)',
+                          boxShadow: isCurrent ? '0 0 16px rgba(56, 189, 248, 0.4)' : 'none',
+                          transition: 'transform 0.2s ease, border-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.03)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                        title={photo.description || photo.author?.name}
+                      >
+                        <img
+                          src={photo.thumbUrl || photo.url}
+                          alt={photo.description || destination.name}
+                          loading="lazy"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '4px',
+                          left: '6px',
+                          right: '6px',
+                          fontSize: '10px',
+                          color: '#FFFFFF',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          textShadow: '0 1px 4px rgba(0,0,0,0.8)'
+                        }}>
+                          {photo.author?.name}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Weather & Best Season Glass Widget */}
           <div className="glass-panel" style={{ padding: '24px' }}>
             <h3 style={{ fontSize: '18px', fontFamily: 'var(--font-display)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>

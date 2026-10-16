@@ -176,6 +176,18 @@ class ApiClient {
   async exportTrip(tripId, format = 'json') {
     return this.request(`/trips/${tripId}/export?format=${format}`);
   }
+
+  // Unsplash Photos Integration
+  async searchPhotos(query, perPage = 12, orientation = 'landscape') {
+    const q = encodeURIComponent(query);
+    return this.request(`/photos/search?q=${q}&per_page=${perPage}&orientation=${orientation}`);
+  }
+
+  async getRandomPhoto(query) {
+    const q = encodeURIComponent(query);
+    return this.request(`/photos/random?q=${q}`);
+  }
 }
 
 export const api = new ApiClient();
+
