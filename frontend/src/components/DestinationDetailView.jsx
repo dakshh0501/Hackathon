@@ -54,7 +54,7 @@ export default function DestinationDetailView({ destination, biome, onBack, onPl
           }}
         >
           <ArrowLeft size={16} />
-          <span>Back to Biospheres</span>
+          <span>Back to Home</span>
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
