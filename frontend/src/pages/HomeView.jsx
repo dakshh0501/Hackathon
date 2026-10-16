@@ -1,14 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, ArrowRight, Compass, Sparkles, MapPin, Calendar, Clock, Star, Users } from 'lucide-react';
-import { DESTINATIONS } from '../data/travelData';
+import { DESTINATIONS as FALLBACK_DESTINATIONS } from '../data/travelData';
+import { api } from '../services/api';
 
 export default function HomeView({ onSelectDestination, onPlanTrip, onExploreAll }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [destinations, setDestinations] = useState(FALLBACK_DESTINATIONS);
 
-  const filteredDestinations = DESTINATIONS.filter(d => 
+  useEffect(() => {
+    async function loadBackendDestinations() {
+      try {
+        const liveDests = await api.getDestinations();
+        if (Array.isArray(liveDests) && liveDests.length > 0) {
+          // Map backend destinations to match HomeView schema
+          const formatted = liveDests.map((d) => ({
+            id: d.id,
+            slug: d.slug,
+            name: d.name,
+            state: d.state,
+            tagline: d.tagline,
+            description: d.description,
+            coverImage: d.heroImage || 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1000&q=80',
+            baseCostPerDay: 4500,
+            idealDays: 3,
+            highlights: ['Heritage Landmark', 'Cultural Heritage', 'Architecture'],
+          }));
+          setDestinations(formatted);
+        }
+      } catch (err) {
+        console.warn('Backend destinations fallback:', err);
+      }
+    }
+    loadBackendDestinations();
+  }, []);
+
+  const filteredDestinations = destinations.filter(d => 
     d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     d.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    d.tagline.toLowerCase().includes(searchQuery.toLowerCase())
+    (d.tagline && d.tagline.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
