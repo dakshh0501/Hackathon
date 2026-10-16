@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/errorHandler.ts';
 import { sendSuccess } from './lib/response.ts';
 import { AppError } from './lib/AppError.ts';
 import { openApiSpec } from './openapi/spec.ts';
+import { discoveryRouter } from './modules/discovery/discovery.routes.ts';
 
 export const app = express();
 
@@ -56,8 +57,9 @@ app.get('/openapi.json', (_req: Request, res: Response) => {
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
-// API v1 Router placeholder (modules will mount here)
+// API v1 Router
 const apiV1Router = express.Router();
+apiV1Router.use('/', discoveryRouter);
 app.use('/api/v1', apiV1Router);
 
 // Root greeting

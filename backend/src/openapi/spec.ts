@@ -145,6 +145,136 @@ export const openApiSpec = {
         },
       },
     },
+    "/meta/layers": {
+      get: {
+        summary: "Get default landscape parallax layers for Scene 1 (behind the duffel bag mascot)",
+        responses: {
+          200: {
+            description: "Layered parallax assets and branding",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      type: "object",
+                      properties: {
+                        branding: {
+                          type: "object",
+                          properties: {
+                            name: { type: "string" },
+                            tagline: { type: "string" },
+                          },
+                        },
+                        layers: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              id: { type: "string" },
+                              name: { type: "string" },
+                              url: { type: "string" },
+                              speed: { type: "number" },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/destinations/suggest": {
+      get: {
+        summary: "Get rapid search-as-you-type destination suggestions for the explorer character search bar",
+        parameters: [
+          { name: "q", in: "query", schema: { type: "string" }, description: "Search query string" },
+        ],
+        responses: {
+          200: {
+            description: "Matching destination suggestions",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "string" },
+                          slug: { type: "string" },
+                          name: { type: "string" },
+                          state: { type: "string" },
+                          type: { type: "string" },
+                          tagline: { type: "string" },
+                          thumbnailUrl: { type: "string" },
+                          dataDepth: { type: "string" },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/destinations/{slug}/discovery": {
+      get: {
+        summary: "Get complete categorized discovery data for destination reveal animation",
+        parameters: [
+          { name: "slug", in: "path", required: true, schema: { type: "string" }, description: "Destination slug (e.g. jammu-and-kashmir, agra, jaipur)" },
+        ],
+        responses: {
+          200: {
+            description: "Full destination discovery payload with photos, parallax layers, and categories",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string" },
+                        slug: { type: "string" },
+                        name: { type: "string" },
+                        state: { type: "string" },
+                        tagline: { type: "string" },
+                        description: { type: "string" },
+                        heroImage: { type: "string" },
+                        bestMonths: { type: "array", items: { type: "string" } },
+                        dataDepth: { type: "string" },
+                        dataStatus: { type: "string" },
+                        parallaxLayers: { type: "object" },
+                        gallery: { type: "array", items: { type: "object" } },
+                        categories: {
+                          type: "object",
+                          properties: {
+                            places_to_explore: { type: "array", items: { type: "object" } },
+                            local_culture: { type: "array", items: { type: "object" } },
+                            traditional_products: { type: "array", items: { type: "object" } },
+                            food_and_cuisine: { type: "array", items: { type: "object" } },
+                            scenic_highlights: { type: "array", items: { type: "object" } },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/auth/register": {
       post: {
         summary: "Register new user",
