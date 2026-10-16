@@ -106,7 +106,7 @@ export default function App() {
   const [searchError, setSearchError] = useState(null);
 
   // Search handler: match any city, state, or region of India with strict location validation
-  const handleSearch = (query) => {
+  const handleSearch = async (query) => {
     if (!query || !query.trim()) return;
 
     // Search across verified locations (Vrindavan, Mathura, Jhansi, Delhi, Assam, etc.)
@@ -118,7 +118,7 @@ export default function App() {
       const targetBiome = SKETCH_BIOMES.find(b => b.id === indiaMatch.biomeCategory) || SKETCH_BIOMES[2];
       setActiveBiomeId(targetBiome.id);
 
-      setSelectedDestination({
+      const destData = {
         id: indiaMatch.name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
         name: indiaMatch.name,
         country: indiaMatch.state,
@@ -133,8 +133,25 @@ export default function App() {
         safetyIndex: indiaMatch.safetyIndex,
         dailyBudget: indiaMatch.budget,
         experiences: indiaMatch.highlights
-      });
+      };
+
+      setSelectedDestination(destData);
       setViewMode('DESTINATION_DETAIL');
+
+      // Asynchronously fetch fresh high-res Unsplash image for the searched city or landmark
+      try {
+        const famousPlace = indiaMatch.highlights?.[0] || indiaMatch.specialties?.[0] || '';
+        const searchPhotoQuery = `${indiaMatch.name} ${famousPlace}`.trim();
+        const photoResult = await api.getRandomPhoto(searchPhotoQuery);
+        if (photoResult?.url || photoResult?.regularUrl) {
+          setSelectedDestination(prev => ({
+            ...prev,
+            image: photoResult.regularUrl || photoResult.url
+          }));
+        }
+      } catch (e) {
+        console.warn('Could not fetch live Unsplash photo for destination:', e);
+      }
     } else {
       // Show exact requested error message without redirecting
       setSearchError('Please search valid location.');
