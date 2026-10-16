@@ -1,18 +1,57 @@
-/* TravelTales Immersive Animated Experience Styling (Desktop & Laptop Target) */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&display=swap');
+/* TERRA Design Tokens & Visual Architecture Specification
+   3-Layer Glassmorphism, 10 Biomes, Syne & Inter Typography
+   Running at 60-90fps on GPU Compositor
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap');
 
 :root {
-  --bg-dark: #0A141D;
-  --forest-green: #114232;
-  --forest-green-hover: #0b3024;
-  --terracotta: #C85A32;
-  --gold-accent: #D4A373;
-  --ivory-warm: #FAF6ED;
-  --text-main: #1C1E1B;
-  --text-muted: #6B7068;
+  /* Background Ecosystem */
+  --color-void: #040608;
+  --color-abyss: rgba(8, 12, 20, 0.95);
 
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  /* Glass Tokens */
+  --glass-primary: rgba(255, 255, 255, 0.06);
+  --glass-secondary: rgba(255, 255, 255, 0.10);
+  --glass-elevated: rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.13);
+  --glass-glow: rgba(255, 255, 255, 0.05);
+
+  /* Biome Accent Palettes */
+  --biome-desert: #D97706;
+  --biome-ocean: #0284C7;
+  --biome-mountain: #64748B;
+  --biome-beach: #0EA5E9;
+  --biome-grassland: #16A34A;
+  --biome-rainforest: #065F46;
+  --biome-tundra: #94A3B8;
+  --biome-glacier: #BAE6FD;
+  --biome-volcanic: #7C3AED;
+  --biome-savanna: #CA8A04;
+
+  /* Semantic Accents */
+  --accent-primary: #38BDF8;
+  --accent-success: #34D399;
+  --accent-warning: #FBBF24;
+  --accent-danger: #F87171;
+
+  /* Typography Colors */
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-muted: rgba(255, 255, 255, 0.40);
+
+  /* Typography Families */
+  --font-display: 'Syne', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Radius Tokens */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 9999px;
+  --radius-card: 20px;
+  --radius-slide: 28px;
 }
 
 * {
@@ -25,264 +64,147 @@ html, body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
+  background-color: var(--color-void);
+  color: var(--text-primary);
   font-family: var(--font-sans);
-  background-color: var(--bg-dark);
-  color: var(--text-main);
   -webkit-font-smoothing: antialiased;
+  user-select: none;
 }
 
-/* =========================================================
-   KEYFRAME ANIMATIONS: DUFFEL BAG MASCOT & EXPLORER
-   ========================================================= */
+/* Glassmorphism Classes (From Document Spec) */
 
-/* Center Idle Float & Breathing for the living duffel bag */
-@keyframes bagGentleBob {
+/* Level 1 — Base Glass Panel */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-card);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Level 2 — Elevated Glass (Cards, Modals) */
+.glass-elevated {
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+/* Level 3 — Interactive Glass (Buttons, Inputs, Chips) */
+.glass-interactive {
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: var(--radius-pill);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.glass-interactive:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+  transform: translateY(-1px);
+}
+
+.glass-interactive:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.10);
+}
+
+/* Ticker Infinite Left Scroll Animation */
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: tickerScroll 38s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* Atmosphere Particle Float Animation */
+@keyframes atmosphericFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+  50% { transform: translateY(-24px) rotate(15deg); opacity: 0.8; }
+}
+
+.particle-dot {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: atmosphericFloat 6s ease-in-out infinite;
+}
+
+/* Biome Zoom-to-Result Keyframe Portal Effect */
+@keyframes portalZoom {
   0% {
-    transform: translateY(0px) rotate(0deg);
+    transform: scale(1);
+    filter: brightness(1) blur(0px);
   }
-  30% {
-    transform: translateY(-16px) rotate(-1.5deg);
+  50% {
+    transform: scale(1.4);
+    filter: brightness(1.2) blur(1px);
+  }
+  100% {
+    transform: scale(2.2);
+    filter: brightness(1.8) blur(4px);
+    opacity: 0;
+  }
+}
+
+.portal-active {
+  animation: portalZoom 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Netflix Expand Portal Card Animation */
+@keyframes netflixExpand {
+  0% {
+    transform: scale(0.7) translateY(40px);
+    opacity: 0;
   }
   60% {
-    transform: translateY(-8px) rotate(1.2deg);
+    transform: scale(1.03) translateY(-4px);
+    opacity: 1;
   }
   100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-}
-
-.bag-center-float {
-  animation: bagGentleBob 4.2s ease-in-out infinite;
-  transform-origin: center bottom;
-}
-
-/* Sidebar idle float */
-@keyframes bagSidebarBob {
-  0% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-8px) rotate(-1deg);
-  }
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-}
-
-.bag-sidebar-float {
-  animation: bagSidebarBob 3.6s ease-in-out infinite;
-  transform-origin: center center;
-}
-
-/* Bag handle subtle sway */
-@keyframes handleSway {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(2deg) translateY(-1px);
-  }
-}
-
-.bag-handle-sway {
-  transform-origin: 160px 40px;
-  animation: handleSway 3.2s ease-in-out infinite;
-}
-
-/* Keychain pendulum sway */
-@keyframes keychainSwing {
-  0%, 100% {
-    transform: rotate(-4deg);
-  }
-  50% {
-    transform: rotate(8deg);
-  }
-}
-
-.bag-keychain-sway {
-  transform-origin: 80px 118px;
-  animation: keychainSwing 2.8s ease-in-out infinite;
-}
-
-/* Zipper charm wiggle */
-@keyframes zipperWiggle {
-  0%, 100% {
-    transform: translate(180px, 88px) rotate(0deg);
-  }
-  35% {
-    transform: translate(180px, 88px) rotate(5deg);
-  }
-  70% {
-    transform: translate(180px, 88px) rotate(-4deg);
-  }
-}
-
-.bag-zipper-pull {
-  animation: zipperWiggle 4s ease-in-out infinite;
-}
-
-/* Explorer natural idle breathing */
-@keyframes explorerIdle {
-  0%, 100% {
-    transform: translateY(0px) scale(1);
-  }
-  50% {
-    transform: translateY(-6px) scale(1.01);
-  }
-}
-
-.explorer-idle {
-  animation: explorerIdle 3.8s ease-in-out infinite;
-}
-
-/* Explorer discovery welcoming gesture */
-@keyframes discoveryBob {
-  0%, 100% {
-    transform: translateY(0px) scale(1.02);
-  }
-  50% {
-    transform: translateY(-8px) scale(1.04);
-  }
-}
-
-.explorer-discovery {
-  animation: discoveryBob 3.4s ease-in-out infinite;
-}
-
-/* Arm gesture waving */
-@keyframes armGesture {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(-3deg);
-  }
-}
-
-.explorer-discovery-gesture {
-  animation: armGesture 2.4s ease-in-out infinite;
-  transform-origin: center;
-}
-
-/* Rotating Compass */
-@keyframes compassSpin {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(15deg); }
-  50% { transform: rotate(-10deg); }
-  75% { transform: rotate(5deg); }
-  100% { transform: rotate(0deg); }
-}
-
-.rotating-compass {
-  animation: compassSpin 6s ease-in-out infinite;
-}
-
-/* Smooth UI Fade & Scale Entrances */
-@keyframes slideUpFade {
-  from {
-    opacity: 0;
-    transform: translateY(32px) scale(0.97);
-  }
-  to {
+    transform: scale(1) translateY(0);
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.netflix-expand-enter {
+  animation: netflixExpand 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(217, 119, 6, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 35px rgba(217, 119, 6, 0.8);
-  }
+/* Custom Scrollbar for Glass Panes */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-
-.pulse-instruction {
-  animation: pulseGlow 2.8s ease-in-out infinite;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
-
-/* Destination Photo Cards Staggered Entry */
-@keyframes cardSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.destination-photo-card {
-  animation: cardSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.destination-photo-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25) !important;
-}
-
-/* Buttons and Interactions */
-.btn-primary {
-  background: var(--forest-green);
-  color: #FFFFFF;
-  border: none;
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 9999px;
-  padding: 10px 22px;
-  font-weight: 700;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
-
-.btn-primary:hover {
-  background: var(--forest-green-hover);
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--forest-green);
-  border: 1px solid #E7DFD3;
-  border-radius: 9999px;
-  padding: 10px 20px;
-  font-weight: 700;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background: #FFFFFF;
-  transform: translateY(-1px);
-}
-
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.6);
 }
