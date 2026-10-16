@@ -3,7 +3,7 @@ import {
   Bot, Send, Sparkles, X, Compass, MapPin, 
   ArrowRight, ShieldCheck, DollarSign, Calendar 
 } from 'lucide-react';
-import { searchAllIndia, ALL_INDIAN_DESTINATIONS } from '../data/allIndiaDestinations';
+import { searchStrictLocation, ALL_INDIAN_DESTINATIONS } from '../data/allIndiaDestinations';
 
 /**
  * Backpack Mascot AI Travel Chatbot:
@@ -33,25 +33,38 @@ export default function MascotChatbotModal({ isOpen, onClose, onSelectDestinatio
     setInput('');
     setIsTyping(true);
 
-    // Search destination match
+    // Search destination match with strict location validation
     setTimeout(() => {
-      const match = searchAllIndia(query);
+      const match = searchStrictLocation(query);
 
-      let reply = `I found wonderful travel insights for **${match.name}** (${match.state})!`;
-      reply += `\n\n• **Highlights**: ${match.highlights.slice(0, 3).join(', ')}`;
-      reply += `\n• **Best Time**: ${match.bestMonths}`;
-      reply += `\n• **Estimated Budget**: Around ₹${match.budget.mid.toLocaleString('en-IN')}/day for a comfortable stay.`;
-
-      setMessages(prev => [
-        ...prev, 
-        { 
-          sender: 'bot', 
-          text: reply,
-          matchedDestination: match
+      if (match) {
+        let reply = `I found wonderful travel insights for **${match.name}** (${match.state})!`;
+        if (match.specialties) {
+          reply += `\n• **Famous For**: ${match.specialties.join(', ')}`;
         }
-      ]);
+        reply += `\n• **Key Highlights**: ${match.highlights.slice(0, 3).join(', ')}`;
+        reply += `\n• **Best Time**: ${match.bestMonths}`;
+        reply += `\n• **Estimated Budget**: Around ₹${match.budget.mid.toLocaleString('en-IN')}/day for a comfortable stay.`;
+
+        setMessages(prev => [
+          ...prev, 
+          { 
+            sender: 'bot', 
+            text: reply,
+            matchedDestination: match
+          }
+        ]);
+      } else {
+        setMessages(prev => [
+          ...prev,
+          {
+            sender: 'bot',
+            text: "Please search valid location. (e.g. Vrindavan, Mathura, Jhansi, Delhi, Jaipur, Goa, Assam, Manali, Kerala, etc.)"
+          }
+        ]);
+      }
       setIsTyping(false);
-    }, 600);
+    }, 500);
   };
 
   return (

@@ -7,7 +7,7 @@ import { SKETCH_BIOMES } from '../data/sketchBiomes';
  * Centered horizontally across Columns 3 & 4 (Mountain & Forest), exactly as drawn in the sketch.
  * Floating glass capsule allowing discovery of any biome or destination.
  */
-export default function SearchOverlay({ onSearch, activeBiome }) {
+export default function SearchOverlay({ onSearch, activeBiome, searchError }) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
 
@@ -101,6 +101,28 @@ export default function SearchOverlay({ onSearch, activeBiome }) {
           </button>
         </div>
       </form>
+
+      {/* Invalid Location Warning Message */}
+      {searchError && (
+        <div style={{
+          marginTop: '12px',
+          textAlign: 'center',
+          backgroundColor: 'rgba(225, 29, 72, 0.9)',
+          color: '#FFFFFF',
+          padding: '8px 18px',
+          borderRadius: '9999px',
+          fontSize: '13px',
+          fontWeight: 700,
+          boxShadow: '0 8px 24px rgba(225, 29, 72, 0.4)',
+          backdropFilter: 'blur(10px)',
+          animation: 'slideUpFade 0.3s ease',
+          display: 'inline-block',
+          marginLeft: '50%',
+          transform: 'translateX(-50%)'
+        }}>
+          ⚠️ {searchError}
+        </div>
+      )}
     </div>
   );
 }

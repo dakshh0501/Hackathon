@@ -8,7 +8,7 @@ import DestinationDetailView from './components/DestinationDetailView';
 import ItineraryBuilderScreen from './components/ItineraryBuilderScreen';
 import AIAssistantPanel from './components/AIAssistantPanel';
 import MascotChatbotModal from './components/MascotChatbotModal';
-import { searchAllIndia } from './data/allIndiaDestinations';
+import { searchStrictLocation } from './data/allIndiaDestinations';
 import { Compass, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -27,14 +27,18 @@ export default function App() {
   // Active biome object
   const activeBiome = SKETCH_BIOMES.find(b => b.id === (hoveredBiomeId || activeBiomeId)) || SKETCH_BIOMES[2];
 
-  // Search handler: match any city, state, or region of India
+  // Search error state
+  const [searchError, setSearchError] = useState(null);
+
+  // Search handler: match any city, state, or region of India with strict location validation
   const handleSearch = (query) => {
     if (!query || !query.trim()) return;
 
-    // Search across all India (Delhi, Jaipur, Goa, Manali, Kerala, etc.)
-    const indiaMatch = searchAllIndia(query);
+    // Search across verified locations (Vrindavan, Mathura, Jhansi, Delhi, Assam, etc.)
+    const indiaMatch = searchStrictLocation(query);
 
     if (indiaMatch) {
+      setSearchError(null);
       // Find matching column biome
       const targetBiome = SKETCH_BIOMES.find(b => b.id === indiaMatch.biomeCategory) || SKETCH_BIOMES[2];
       setActiveBiomeId(targetBiome.id);
@@ -46,16 +50,20 @@ export default function App() {
         flag: '🇮🇳',
         image: indiaMatch.coverImage,
         coordinates: indiaMatch.coordinates || { lat: 26.2006, lng: 92.9376 },
-        rating: 4.94,
+        rating: 4.96,
         reviewsCount: 1950,
         description: indiaMatch.description,
-        story: `${indiaMatch.name} is one of India's most celebrated travel regions in ${indiaMatch.state}. It boasts rich cultural legacies, authentic cuisine, and timeless seasonal weather windows.`,
+        story: `${indiaMatch.name} is one of India's most celebrated destinations in ${indiaMatch.state}. It is famous for: ${indiaMatch.specialties?.join(' • ') || indiaMatch.highlights.join(' • ')}.`,
         weather: indiaMatch.weather,
         safetyIndex: indiaMatch.safetyIndex,
         dailyBudget: indiaMatch.budget,
         experiences: indiaMatch.highlights
       });
       setViewMode('DESTINATION_DETAIL');
+    } else {
+      // Show exact requested error message without redirecting
+      setSearchError('Please search valid location.');
+      setTimeout(() => setSearchError(null), 3500);
     }
   };
 
@@ -227,6 +235,7 @@ export default function App() {
           <SearchOverlay
             activeBiome={activeBiome}
             onSearch={handleSearch}
+            searchError={searchError}
           />
 
           {/* ====================================================
