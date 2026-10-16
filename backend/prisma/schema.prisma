@@ -1,0 +1,352 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum DataStatus {
+  sample
+  verified
+}
+
+enum DataDepth {
+  basic
+  standard
+  deep
+}
+
+enum DestinationType {
+  state
+  ut
+  city
+}
+
+enum Pace {
+  relaxed
+  moderate
+  packed
+}
+
+enum Tier {
+  budget
+  standard
+  premium
+}
+
+enum TravellerType {
+  adult
+  child
+  senior
+}
+
+enum ChecklistType {
+  packing
+  documents
+  accessibility
+}
+
+enum SplitType {
+  equal
+  custom
+}
+
+model User {
+  id           String            @id @default(uuid())
+  name         String
+  email        String            @unique
+  passwordHash String            @map("password_hash")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  trips        Trip[]
+  tripMembers  TripMember[]
+  savedItems   SavedAttraction[]
+  notes        Note[]
+  reviews      Review[]
+
+  @@map("users")
+}
+
+model Destination {
+  id             String          @id @default(uuid())
+  slug           String          @unique
+  name           String
+  state          String
+  type           DestinationType @default(city)
+  parentId       String?         @map("parent_id")
+  parent         Destination?    @relation("DestinationHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children       Destination[]   @relation("DestinationHierarchy")
+  description    String
+  lat            Float?
+  lng            Float?
+  bestMonths     String[]        @map("best_months")
+  dataDepth      DataDepth       @default(basic) @map("data_depth")
+  population     Int?
+  dataStatus     DataStatus      @default(sample) @map("data_status")
+  source         String?
+  lastVerifiedAt DateTime?       @map("last_verified_at")
+  createdAt      DateTime        @default(now()) @map("created_at")
+
+  attractions  Attraction[]
+  costProfiles CostProfile[]
+  trips        Trip[]
+
+  @@index([type, parentId])
+  @@map("destinations")
+}
+
+model Attraction {
+  id             String     @id @default(uuid())
+  slug           String     @unique
+  destinationId  String     @map("destination_id")
+  destination    Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  name           String
+  category       String
+  description    String
+  lat            Float
+  lng            Float
+  avgVisitMinutes Int       @map("avg_visit_minutes")
+  popularity     Int        @default(50)
+  tags           String[]
+  minAge         Int?       @map("min_age")
+  dataStatus     DataStatus @default(sample) @map("data_status")
+  source         String?
+  lastVerifiedAt DateTime?  @map("last_verified_at")
+  createdAt      DateTime   @default(now()) @map("created_at")
+
+  hours       AttractionHours[]
+  prices      AttractionPrice[]
+  access      AttractionAccess?
+  items       ItineraryItem[]
+  savedBy     SavedAttraction[]
+  reviews     Review[]
+
+  @@index([destinationId, category])
+  @@index([avgVisitMinutes])
+  @@map("attractions")
+}
+
+model AttractionHours {
+  id           String     @id @default(uuid())
+  attractionId String     @map("attraction_id")
+  attraction   Attraction @relation(fields: [attractionId], references: [id], onDelete: Cascade)
+  weekday      Int        // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  openTime     String?    @map("open_time") // HH:mm
+  closeTime    String?    @map("close_time") // HH:mm
+  isClosed     Boolean    @default(false) @map("is_closed")
+
+  @@index([attractionId, weekday])
+  @@map("attraction_hours")
+}
+
+model AttractionPrice {
+  id            String        @id @default(uuid())
+  attractionId  String        @map("attraction_id")
+  attraction    Attraction    @relation(fields: [attractionId], references: [id], onDelete: Cascade)
+  travellerType TravellerType @map("traveller_type")
+  amountPaise   Int           @map("amount_paise") // stored in integer paise
+  dataStatus    DataStatus    @default(sample) @map("data_status")
+
+  @@map("attraction_prices")
+}
+
+model AttractionAccess {
+  id           String     @id @default(uuid())
+  attractionId String     @unique @map("attraction_id")
+  attraction   Attraction @relation(fields: [attractionId], references: [id], onDelete: Cascade)
+  stepFree     String?    @map("step_free") // yes, no, or null
+  wheelchairOk String?    @map("wheelchair_ok") // yes, no, or null
+  seating      String?    // yes, no, or null
+  restrooms    String?    // yes, no, or null
+  strollerOk   String?    @map("stroller_ok") // yes, no, or null
+  walkingLevel Int?       @map("walking_level") // 1 (easy) to 3 (strenuous)
+  notes        String?
+  dataStatus   DataStatus @default(sample) @map("data_status")
+
+  @@map("attraction_access")
+}
+
+model CostProfile {
+  id                    String       @id @default(uuid())
+  destinationId         String?      @map("destination_id")
+  destination           Destination? @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  tier                  Tier
+  hotelPerNightPaise    Int          @map("hotel_per_night_paise")
+  foodPerPersonDayPaise Int          @map("food_per_person_day_paise")
+  localTransportPerKmPaise Int       @map("local_transport_per_km_paise")
+
+  @@unique([destinationId, tier])
+  @@map("cost_profiles")
+}
+
+model Trip {
+  id            String      @id @default(uuid())
+  ownerId       String      @map("owner_id")
+  owner         User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  destinationId String      @map("destination_id")
+  destination   Destination @relation(fields: [destinationId], references: [id])
+  title         String
+  startDate     String      @map("start_date") // YYYY-MM-DD
+  endDate       String      @map("end_date") // YYYY-MM-DD
+  adults        Int         @default(1)
+  children      Int         @default(0)
+  seniors       Int         @default(0)
+  pace          Pace        @default(moderate)
+  tier          Tier        @default(standard)
+  budgetPaise   Int         @map("budget_paise")
+  interests     String[]
+  needs         String[]
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  members         TripMember[]
+  itineraryDays   ItineraryDay[]
+  budgetSnapshots BudgetSnapshot[]
+  expenses        Expense[]
+  checklistItems  ChecklistItem[]
+  notes           Note[]
+  shareLinks      ShareLink[]
+
+  @@map("trips")
+}
+
+model TripMember {
+  id          String        @id @default(uuid())
+  tripId      String        @map("trip_id")
+  trip        Trip          @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  userId      String?       @map("user_id")
+  user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  displayName String        @map("display_name")
+  splits      ExpenseSplit[]
+
+  @@map("trip_members")
+}
+
+model ItineraryDay {
+  id        String          @id @default(uuid())
+  tripId    String          @map("trip_id")
+  trip      Trip            @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  dayNumber Int             @map("day_number")
+  date      String          // YYYY-MM-DD
+  items     ItineraryItem[]
+
+  @@unique([tripId, dayNumber])
+  @@map("itinerary_days")
+}
+
+model ItineraryItem {
+  id                         String       @id @default(uuid())
+  dayId                      String       @map("day_id")
+  day                        ItineraryDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
+  attractionId               String       @map("attraction_id")
+  attraction                 Attraction   @relation(fields: [attractionId], references: [id], onDelete: Cascade)
+  startTime                  String       @map("start_time") // HH:mm
+  endTime                    String       @map("end_time") // HH:mm
+  orderIndex                 Int          @map("order_index")
+  note                       String?
+  travelFromPreviousMinutes  Int?         @map("travel_from_previous_minutes")
+
+  @@index([dayId, orderIndex])
+  @@map("itinerary_items")
+}
+
+model BudgetSnapshot {
+  id            String   @id @default(uuid())
+  tripId        String   @map("trip_id")
+  trip          Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  breakdownJson Json     @map("breakdown_json")
+  minPaise      Int      @map("min_paise")
+  likelyPaise   Int      @map("likely_paise")
+  maxPaise      Int      @map("max_paise")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("budget_snapshots")
+}
+
+model Expense {
+  id          String         @id @default(uuid())
+  tripId      String         @map("trip_id")
+  trip        Trip           @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  paidById    String         @map("paid_by_id")
+  amountPaise Int            @map("amount_paise")
+  category    String
+  description String
+  date        String         // YYYY-MM-DD
+  splitType   SplitType      @default(equal) @map("split_type")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  splits      ExpenseSplit[]
+
+  @@index([tripId])
+  @@map("expenses")
+}
+
+model ExpenseSplit {
+  id          String     @id @default(uuid())
+  expenseId   String     @map("expense_id")
+  expense     Expense    @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  memberId    String     @map("member_id")
+  member      TripMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  sharePaise  Int        @map("share_paise")
+
+  @@map("expense_splits")
+}
+
+model SavedAttraction {
+  id           String     @id @default(uuid())
+  userId       String     @map("user_id")
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attractionId String     @map("attraction_id")
+  attraction   Attraction @relation(fields: [attractionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@unique([userId, attractionId])
+  @@map("saved_attractions")
+}
+
+model ChecklistItem {
+  id         String        @id @default(uuid())
+  tripId     String        @map("trip_id")
+  trip       Trip          @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  type       ChecklistType
+  label      String
+  isDone     Boolean       @default(false) @map("is_done")
+  sourceRule String?       @map("source_rule")
+
+  @@map("checklist_items")
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  tripId    String   @map("trip_id")
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("notes")
+}
+
+model Review {
+  id           String     @id @default(uuid())
+  attractionId String     @map("attraction_id")
+  attraction   Attraction @relation(fields: [attractionId], references: [id], onDelete: Cascade)
+  userId       String     @map("user_id")
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating       Int
+  body         String
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@map("reviews")
+}
+
+model ShareLink {
+  id        String    @id @default(uuid())
+  tripId    String    @map("trip_id")
+  trip      Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime? @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("share_links")
+}
