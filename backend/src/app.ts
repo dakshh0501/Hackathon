@@ -9,6 +9,7 @@ import { sendSuccess } from './lib/response.ts';
 import { AppError } from './lib/AppError.ts';
 import { openApiSpec } from './openapi/spec.ts';
 import { discoveryRouter } from './modules/discovery/discovery.routes.ts';
+import { intelligenceRouter } from './modules/intelligence/intelligence.routes.ts';
 
 export const app = express();
 
@@ -60,6 +61,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 // API v1 Router
 const apiV1Router = express.Router();
 apiV1Router.use('/', discoveryRouter);
+apiV1Router.use('/', intelligenceRouter);
 app.use('/api/v1', apiV1Router);
 
 // Root greeting
