@@ -489,3 +489,6 @@ export function searchStrictLocation(query) {
   // Not recognized as a valid city or state
   return null;
 }
+
+// Alias export for backwards compatibility
+export const searchAllIndia = searchStrictLocation;
