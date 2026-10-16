@@ -45,7 +45,7 @@ export default function App() {
         country: indiaMatch.state,
         flag: '🇮🇳',
         image: indiaMatch.coverImage,
-        coordinates: { lat: 28.6139, lng: 77.2090 },
+        coordinates: indiaMatch.coordinates || { lat: 26.2006, lng: 92.9376 },
         rating: 4.94,
         reviewsCount: 1950,
         description: indiaMatch.description,
