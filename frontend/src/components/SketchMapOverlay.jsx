@@ -1,67 +1,128 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Navigation, MapPin, Maximize2, Minimize2, Layers, 
-  Compass, ExternalLink, ShieldCheck, Crosshair 
+  Navigation, MapPin, Layers, Crosshair, Move 
 } from 'lucide-react';
 
 /**
- * Bottom-Left Real GPS Map Overlay:
- * Uses live satellite/road OpenStreetMap & Google Maps embed tiles
- * for real GPS navigation, live coordinates, terrain/satellite toggles,
- * and pinpoints the active destination precisely.
+ * Draggable Floating Real GPS India Map Overlay:
+ * - Shows exclusively India / Indian territory destinations (Rajasthan, Ladakh, Kerala, Himalayas, etc.)
+ * - Floatable: can be dragged anywhere across the screen from left to right / top to bottom
+ * - Expand button removed per user request
+ * - Satellite vs Roadmap toggle with clean telemetry
  */
-export default function SketchMapOverlay({ activeBiome, isExpanded, onToggleExpand }) {
+export default function SketchMapOverlay({ activeBiome }) {
   const [mapType, setMapType] = useState('roadmap'); // 'roadmap' | 'satellite'
 
-  // Coordinates from active biome destination
-  const activeDest = activeBiome?.destinations?.[0];
-  const locationName = activeDest?.name || 'Rajasthan, India';
+  // Draggable positioning state
+  const [position, setPosition] = useState({ x: 20, y: window.innerHeight - 300 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ startX: 0, startY: 0, initialX: 0, initialY: 0 });
 
-  // Real GPS map embed URL using OpenStreetMap / CartoDB Dark Matter / Google Map iframe
+  // Update initial Y on mount or window resize
+  useEffect(() => {
+    setPosition({ x: 20, y: Math.max(80, window.innerHeight - 300) });
+  }, []);
+
+  const handleMouseDown = (e) => {
+    // Only drag when clicking the header bar
+    setIsDragging(true);
+    dragStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      initialX: position.x,
+      initialY: position.y
+    };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStartRef.current.startX;
+      const dy = e.clientY - dragStartRef.current.startY;
+      const newX = Math.min(Math.max(10, dragStartRef.current.initialX + dx), window.innerWidth - 330);
+      const newY = Math.min(Math.max(60, dragStartRef.current.initialY + dy), window.innerHeight - 280);
+      setPosition({ x: newX, y: newY });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
+  // Coordinates strictly for India destinations
+  const indianLocations = {
+    desert: 'Thar Desert, Rajasthan, India',
+    beach: 'Goa Beaches, India',
+    mountain: 'Leh Ladakh Himalayas, India',
+    forest: 'Jim Corbett National Park, India',
+    gardens: 'Shalimar Bagh Mughal Gardens, Srinagar, India',
+    river: 'Rishikesh Ganga River, Uttarakhand, India'
+  };
+
+  const locationName = indianLocations[activeBiome?.id] || 'India';
   const encodedLocation = encodeURIComponent(locationName);
+  
+  // Real GPS Google Map iframe locked to India zoom levels
   const mapIframeUrl = mapType === 'satellite'
-    ? `https://maps.google.com/maps?q=${encodedLocation}&t=k&z=11&ie=UTF8&iwloc=&output=embed`
-    : `https://maps.google.com/maps?q=${encodedLocation}&t=m&z=11&ie=UTF8&iwloc=&output=embed`;
+    ? `https://maps.google.com/maps?q=${encodedLocation}&t=k&z=7&ie=UTF8&iwloc=&output=embed`
+    : `https://maps.google.com/maps?q=${encodedLocation}&t=m&z=7&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div
       style={{
-        position: 'absolute',
-        bottom: '24px',
-        left: '20px',
-        width: isExpanded ? '520px' : '320px',
-        height: isExpanded ? '380px' : '270px',
-        zIndex: 50,
+        position: 'fixed',
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        width: '320px',
+        height: '270px',
+        zIndex: 80,
         borderRadius: 'var(--radius-xl)',
-        background: 'rgba(8, 14, 24, 0.92)',
-        backdropFilter: 'blur(28px)',
-        WebkitBackdropFilter: 'blur(28px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 20px 48px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+        background: 'rgba(8, 14, 24, 0.45)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        border: isDragging ? '1px solid var(--accent-primary)' : '1px solid rgba(255, 255, 255, 0.18)',
+        boxShadow: isDragging 
+          ? '0 25px 60px rgba(56, 189, 248, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)' 
+          : '0 20px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
         pointerEvents: 'auto',
-        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+        transition: isDragging ? 'none' : 'box-shadow 0.2s, border 0.2s'
       }}
     >
-      {/* Real GPS Map Top Telemetry Bar */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '10px 14px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-        background: 'rgba(255, 255, 255, 0.04)',
-        zIndex: 10
-      }}>
+      {/* Draggable Header Handle */}
+      <div
+        onMouseDown={handleMouseDown}
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '10px 14px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          background: isDragging ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+          cursor: isDragging ? 'grabbing' : 'grab',
+          userSelect: 'none',
+          zIndex: 10
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Move size={13} color="var(--accent-primary)" />
           <div style={{
-            width: '8px',
-            height: '8px',
+            width: '7px',
+            height: '7px',
             borderRadius: '50%',
             backgroundColor: '#34D399',
-            boxShadow: '0 0 10px #34D399'
+            boxShadow: '0 0 8px #34D399'
           }} />
           <span style={{
             fontSize: '11px',
@@ -71,12 +132,12 @@ export default function SketchMapOverlay({ activeBiome, isExpanded, onToggleExpa
             color: '#38BDF8',
             fontFamily: 'var(--font-mono)'
           }}>
-            REAL GPS SATELLITE
+            GPS INDIA RADAR
           </span>
         </div>
 
-        {/* Satellite vs Road Map Toggle + Expand Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Satellite vs Roadmap toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <button
             onClick={() => setMapType(mapType === 'roadmap' ? 'satellite' : 'roadmap')}
             style={{
@@ -96,28 +157,13 @@ export default function SketchMapOverlay({ activeBiome, isExpanded, onToggleExpa
             <Layers size={11} />
             <span>{mapType === 'satellite' ? 'Satellite' : 'Roadmap'}</span>
           </button>
-
-          <button
-            onClick={onToggleExpand}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'rgba(255,255,255,0.7)',
-              cursor: 'pointer',
-              padding: '2px',
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
-            {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-          </button>
         </div>
       </div>
 
-      {/* Embedded Real Map Viewport */}
+      {/* Embedded Real GPS India Map Viewport */}
       <div style={{ position: 'relative', flexGrow: 1, width: '100%', height: '100%', overflow: 'hidden' }}>
         <iframe
-          title="Real GPS Google Map"
+          title="Real GPS India Map"
           src={mapIframeUrl}
           width="100%"
           height="100%"
@@ -131,7 +177,7 @@ export default function SketchMapOverlay({ activeBiome, isExpanded, onToggleExpa
           allowFullScreen
         />
 
-        {/* Crosshair Center Radar Reticle */}
+        {/* Center Target Reticle */}
         <div style={{
           position: 'absolute',
           top: '50%',
@@ -143,11 +189,11 @@ export default function SketchMapOverlay({ activeBiome, isExpanded, onToggleExpa
           justifyContent: 'center'
         }}>
           <div style={{
-            width: '28px',
-            height: '28px',
+            width: '26px',
+            height: '26px',
             border: '1px solid rgba(56, 189, 248, 0.6)',
             borderRadius: '50%',
-            boxShadow: '0 0 14px rgba(56, 189, 248, 0.4)'
+            boxShadow: '0 0 12px rgba(56, 189, 248, 0.4)'
           }} />
           <div style={{
             position: 'absolute',
@@ -159,7 +205,7 @@ export default function SketchMapOverlay({ activeBiome, isExpanded, onToggleExpa
           }} />
         </div>
 
-        {/* GPS Coordinates & Region Pill */}
+        {/* Bottom Coordinates & Indian Region Pill */}
         <div style={{
           position: 'absolute',
           bottom: '8px',
@@ -167,8 +213,8 @@ export default function SketchMapOverlay({ activeBiome, isExpanded, onToggleExpa
           right: '8px',
           padding: '6px 12px',
           borderRadius: '9999px',
-          backgroundColor: 'rgba(8, 14, 24, 0.9)',
-          border: '1px solid rgba(255, 255, 255, 0.14)',
+          backgroundColor: 'rgba(8, 14, 24, 0.75)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
           backdropFilter: 'blur(10px)',
           display: 'flex',
           justifyContent: 'space-between',
@@ -178,12 +224,12 @@ export default function SketchMapOverlay({ activeBiome, isExpanded, onToggleExpa
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#38BDF8' }}>
             <MapPin size={11} />
-            <span style={{ fontWeight: 700 }}>{locationName}</span>
+            <span style={{ fontWeight: 700 }}>{locationName.split(',')[0]}</span>
           </div>
 
           <div style={{ color: '#34D399', display: 'flex', alignItems: 'center', gap: '3px' }}>
             <Crosshair size={10} />
-            <span>GPS LOCKED</span>
+            <span>INDIA REGION</span>
           </div>
         </div>
       </div>

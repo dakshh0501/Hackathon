@@ -124,7 +124,7 @@ export default function App() {
             }}>
               <Compass size={18} color="var(--accent-primary)" />
               <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '16px', letterSpacing: '0.04em' }}>
-                TERRA
+                TravelTales
               </span>
               <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                 Where every destination breathes
@@ -232,8 +232,6 @@ export default function App() {
               ==================================================== */}
           <SketchMapOverlay
             activeBiome={activeBiome}
-            isExpanded={isMapExpanded}
-            onToggleExpand={() => setIsMapExpanded(!isMapExpanded)}
           />
 
           {/* ====================================================

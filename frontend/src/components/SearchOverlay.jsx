@@ -101,37 +101,6 @@ export default function SearchOverlay({ onSearch, activeBiome }) {
           </button>
         </div>
       </form>
-
-      {/* Suggested Biome Filter Pills beneath search */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        gap: '8px',
-        marginTop: '12px',
-        flexWrap: 'wrap'
-      }}>
-        {SKETCH_BIOMES.map((b) => (
-          <button
-            key={b.id}
-            onClick={() => onSearch(b.name)}
-            style={{
-              backgroundColor: activeBiome?.id === b.id ? b.accentColor : 'rgba(255, 255, 255, 0.12)',
-              color: '#FFFFFF',
-              border: '1px solid',
-              borderColor: activeBiome?.id === b.id ? b.accentColor : 'rgba(255, 255, 255, 0.16)',
-              borderRadius: '9999px',
-              padding: '4px 12px',
-              fontSize: '11px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
-              transition: 'all 0.2s'
-            }}
-          >
-            {b.emoji} {b.name}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
