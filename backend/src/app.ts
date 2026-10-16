@@ -10,6 +10,15 @@ import { AppError } from './lib/AppError.ts';
 import { openApiSpec } from './openapi/spec.ts';
 import { discoveryRouter } from './modules/discovery/discovery.routes.ts';
 import { intelligenceRouter } from './modules/intelligence/intelligence.routes.ts';
+import { authRouter } from './modules/auth/auth.routes.ts';
+import { tripsRouter } from './modules/trips/trips.routes.ts';
+import { checklistsRouter } from './modules/checklists/checklists.routes.ts';
+import { exportRouter } from './modules/export/export.routes.ts';
+import { savedRouter } from './modules/saved/saved.routes.ts';
+import { seedInitialStore } from './data/store.ts';
+
+// Auto-seed in-memory store
+seedInitialStore();
 
 export const app = express();
 
@@ -62,6 +71,11 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 const apiV1Router = express.Router();
 apiV1Router.use('/', discoveryRouter);
 apiV1Router.use('/', intelligenceRouter);
+apiV1Router.use('/', authRouter);
+apiV1Router.use('/', tripsRouter);
+apiV1Router.use('/', checklistsRouter);
+apiV1Router.use('/', exportRouter);
+apiV1Router.use('/', savedRouter);
 app.use('/api/v1', apiV1Router);
 
 // Root greeting

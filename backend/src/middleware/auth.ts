@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AppError } from '../lib/AppError.ts';
-import { verifyToken, TokenPayload } from '../lib/jwt.ts';
+import { verifyToken, type TokenPayload } from '../lib/jwt.ts';
 
 export interface AuthenticatedRequest extends Request {
   user?: TokenPayload;

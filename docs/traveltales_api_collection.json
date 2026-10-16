@@ -1,0 +1,87 @@
+{
+  "info": {
+    "name": "TravelTales API (A9)",
+    "description": "Full collection for testing TravelTales Backend & Intelligence Engine",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4000/health"
+      }
+    },
+    {
+      "name": "Parallax Layers (Scene 1 Background)",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4000/api/v1/meta/layers"
+      }
+    },
+    {
+      "name": "Destination Suggest (Autocomplete)",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4000/api/v1/destinations/suggest?q=jammu"
+      }
+    },
+    {
+      "name": "Destination Discovery Reveal (Jammu & Kashmir)",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4000/api/v1/destinations/jammu-and-kashmir/discovery"
+      }
+    },
+    {
+      "name": "Login (Demo Asha)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"asha@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": "http://localhost:4000/api/v1/auth/login"
+      }
+    },
+    {
+      "name": "List User Trips (My Trips)",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4000/api/v1/trips"
+      }
+    },
+    {
+      "name": "Trip Budget Forecast",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"trp_demo\",\n  \"title\": \"Weekend in Agra\",\n  \"startDate\": \"2026-12-26\",\n  \"endDate\": \"2026-12-28\",\n  \"pace\": \"moderate\",\n  \"tier\": \"standard\",\n  \"budgetPaise\": 2500000,\n  \"adults\": 2,\n  \"children\": 1,\n  \"seniors\": 0,\n  \"needs\": [\"step_free\"],\n  \"interests\": [\"heritage\"],\n  \"days\": [\n    { \"dayNumber\": 1, \"date\": \"2026-12-26\", \"weekday\": 6, \"items\": [] },\n    { \"dayNumber\": 2, \"date\": \"2026-12-27\", \"weekday\": 0, \"items\": [] },\n    { \"dayNumber\": 3, \"date\": \"2026-12-28\", \"weekday\": 1, \"items\": [] }\n  ]\n}"
+        },
+        "url": "http://localhost:4000/api/v1/trips/budget"
+      }
+    },
+    {
+      "name": "Group Settlement",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"members\": [\n    { \"id\": \"m1\", \"name\": \"Asha\" },\n    { \"id\": \"m2\", \"name\": \"Bob\" },\n    { \"id\": \"m3\", \"name\": \"Charan\" }\n  ],\n  \"expenses\": [\n    {\n      \"id\": \"e1\",\n      \"paidById\": \"m1\",\n      \"amountPaise\": 30000,\n      \"splits\": [\n        { \"memberId\": \"m1\", \"sharePaise\": 10000 },\n        { \"memberId\": \"m2\", \"sharePaise\": 10000 },\n        { \"memberId\": \"m3\", \"sharePaise\": 10000 }\n      ]\n    }\n  ]\n}"
+        },
+        "url": "http://localhost:4000/api/v1/trips/settlement"
+      }
+    },
+    {
+      "name": "Export Itinerary (.ics Calendar)",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4000/api/v1/trips/trp_mv_demo/export?format=ics"
+      }
+    }
+  ]
+}
