@@ -91,7 +91,7 @@ export default function SearchOverlay({ onSearch, activeBiome, searchError }) {
 
           <input
             type="text"
-            placeholder="Search over layer (e.g. Desert, Beach, Mountain, Forest, Gardens, River)..."
+            placeholder="Search"
             value={query}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}

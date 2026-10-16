@@ -3,7 +3,6 @@ import { SKETCH_BIOMES } from './data/sketchBiomes';
 import SketchMascot from './components/SketchMascot';
 import SearchOverlay from './components/SearchOverlay';
 import SketchMapOverlay from './components/SketchMapOverlay';
-import AnalysisChartBox from './components/AnalysisChartBox';
 import DestinationDetailView from './components/DestinationDetailView';
 import ItineraryBuilderScreen from './components/ItineraryBuilderScreen';
 import AIAssistantPanel from './components/AIAssistantPanel';
@@ -471,14 +470,7 @@ export default function App() {
             activeBiome={activeBiome}
           />
 
-          {/* ====================================================
-              SKETCH ELEMENT 3: BIOSPHERE ANALYSIS STOCK CHART & VEHICLES
-              Calculates money, charges, and vehicle recommendation engine
-              ==================================================== */}
-          <AnalysisChartBox
-            activeBiome={activeBiome}
-            onSelectBiome={(id) => setActiveBiomeId(id)}
-          />
+
 
           {/* ====================================================
               SKETCH ELEMENT 4: BOTTOM-RIGHT MASCOT BACKPACK

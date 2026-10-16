@@ -37,13 +37,6 @@ The front page is structured around a 6-column panoramic biosphere layout:
 * Mode switcher: Quick toggle between **Roadmap** and **Satellite** views.
 * Fixed aspect ratio with distraction-free controls.
 
-### 📈 Financial Budget & Commute Matrix (Bottom-Center)
-* Ultra-transparent glassmorphic stock-chart interface.
-* **Financial Trajectory**: Interactive SVG area and candlestick charts forecasting daily charges, mid-tier, and luxury travel budgets.
-* **Commute Matrix Engine**: Automatically calculates travel duration, estimated fuel/ticket cost, and comfort score comparing:
-  * 🚙 **SUV / Private Commute**
-  * 🚆 **Express Train / Vande Bharat**
-  * ✈️ **Direct Flight**
 
 ### 🎒 Animated Duffel Bag Mascot & AI Travel Chatbot (Bottom-Right)
 * Positioned in Column 6 with gentle idle breathing, bouncy animations, and expressive eyes.
