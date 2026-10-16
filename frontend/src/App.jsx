@@ -7,7 +7,7 @@ import AnalysisChartBox from './components/AnalysisChartBox';
 import DestinationDetailView from './components/DestinationDetailView';
 import ItineraryBuilderScreen from './components/ItineraryBuilderScreen';
 import AIAssistantPanel from './components/AIAssistantPanel';
-import { Compass, Sparkles, MessageSquare, ArrowLeft } from 'lucide-react';
+import { Compass, Sparkles } from 'lucide-react';
 
 export default function App() {
   // Currently highlighted or active biome (default: Mountain, col 3)
@@ -127,7 +127,7 @@ export default function App() {
                 TERRA
               </span>
               <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                * These are in background
+                Where every destination breathes
               </span>
             </div>
 
@@ -150,9 +150,8 @@ export default function App() {
             </div>
           </header>
 
-          {/* 6 BACKGROUND VERTICAL COLUMNS:
-              DESERT | BEACH | MOUNTAIN | FOREST | GARDENS | RIVER
-              (With thin vertical dividing lines) */}
+          {/* 6 BACKGROUND VERTICAL COLUMNS: PURE SCENIC PHOTOGRAPHY ONLY
+              (All text names removed as requested - pure scenic pictures) */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -170,6 +169,7 @@ export default function App() {
                   onClick={() => handleColumnClick(biome)}
                   onMouseEnter={() => setHoveredBiomeId(biome.id)}
                   onMouseLeave={() => setHoveredBiomeId(null)}
+                  title={`Explore ${biome.name} Sanctuary`}
                   style={{
                     position: 'relative',
                     height: '100%',
@@ -180,7 +180,7 @@ export default function App() {
                     transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                   }}
                 >
-                  {/* High-Resolution Scenic Background Image */}
+                  {/* High-Resolution Scenic Background Image (Pure Photography) */}
                   <div
                     style={{
                       position: 'absolute',
@@ -188,75 +188,30 @@ export default function App() {
                       backgroundImage: `url(${biome.bgImage})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
-                      filter: isHovered || isSelected ? 'brightness(0.7) contrast(1.1)' : 'brightness(0.38) contrast(1.0)',
-                      transform: isHovered ? 'scale(1.05)' : 'scale(1.0)',
+                      filter: isHovered || isSelected ? 'brightness(0.85) contrast(1.1)' : 'brightness(0.55) contrast(1.0)',
+                      transform: isHovered ? 'scale(1.06)' : 'scale(1.0)',
                       transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
                     }}
                   />
 
-                  {/* Dark gradient overlay for text readability */}
+                  {/* Subtle Cinematic Vignette */}
                   <div style={{
                     position: 'absolute',
                     inset: 0,
-                    background: `linear-gradient(180deg, rgba(4,6,8,0.75) 0%, rgba(4,6,8,0.15) 30%, rgba(4,6,8,0.2) 70%, rgba(4,6,8,0.85) 100%)`
+                    background: 'linear-gradient(180deg, rgba(4,6,8,0.3) 0%, transparent 40%, rgba(4,6,8,0.5) 100%)'
                   }} />
 
-                  {/* Active column ambient bottom glow */}
+                  {/* Active column ambient bottom glow line */}
                   <div style={{
                     position: 'absolute',
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    height: '160px',
+                    height: '140px',
                     background: `linear-gradient(to top, ${biome.glowColor} 0%, transparent 100%)`,
-                    opacity: isHovered || isSelected ? 0.7 : 0.2,
+                    opacity: isHovered || isSelected ? 0.6 : 0.15,
                     transition: 'opacity 0.4s ease'
                   }} />
-
-                  {/* VERTICAL LETTER-BY-LETTER HEADING (Exact sketch styling):
-                      D
-                      E
-                      S
-                      E
-                      R
-                      T
-                  */}
-                  <div style={{
-                    position: 'absolute',
-                    top: '70px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px',
-                    zIndex: 20
-                  }}>
-                    {biome.name.split('').map((letter, lIdx) => (
-                      <span
-                        key={lIdx}
-                        style={{
-                          fontFamily: 'Syne, sans-serif',
-                          fontSize: 'clamp(20px, 2.2vw, 32px)',
-                          fontWeight: 800,
-                          lineHeight: 1.05,
-                          color: isHovered || isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
-                          textShadow: isHovered || isSelected ? `0 0 20px ${biome.accentColor}, 0 2px 8px rgba(0,0,0,0.8)` : '0 2px 6px rgba(0,0,0,0.9)',
-                          transition: 'all 0.3s ease'
-                        }}
-                      >
-                        {letter}
-                      </span>
-                    ))}
-
-                    <span style={{
-                      fontSize: '16px',
-                      marginTop: '6px',
-                      opacity: isHovered || isSelected ? 1 : 0.6
-                    }}>
-                      {biome.emoji}
-                    </span>
-                  </div>
                 </div>
               );
             })}
@@ -272,7 +227,7 @@ export default function App() {
           />
 
           {/* ====================================================
-              SKETCH ELEMENT 2: BOTTOM-LEFT "Map Over lay"
+              SKETCH ELEMENT 2: REAL GPS GOOGLE MAP OVERLAY
               Placed in bottom-left covering Desert & Beach (Cols 1 & 2)
               ==================================================== */}
           <SketchMapOverlay
@@ -282,8 +237,8 @@ export default function App() {
           />
 
           {/* ====================================================
-              SKETCH ELEMENT 3: BOTTOM-CENTER "Analysis Chart or box"
-              Placed across Mountain & Forest (Cols 3 & 4)
+              SKETCH ELEMENT 3: BIOSPHERE ANALYSIS STOCK CHART & VEHICLES
+              Calculates money, charges, and vehicle recommendation engine
               ==================================================== */}
           <AnalysisChartBox
             activeBiome={activeBiome}
@@ -291,7 +246,7 @@ export default function App() {
           />
 
           {/* ====================================================
-              SKETCH ELEMENT 4: BOTTOM-RIGHT ANIMATED MASCOT BACKPACK
+              SKETCH ELEMENT 4: BOTTOM-RIGHT MASCOT BACKPACK
               Placed in Column 6 (River bottom-right) with smiling face
               ==================================================== */}
           <div style={{
